@@ -6,11 +6,11 @@
 #define TOUEI_MAX 9
 
 
-static void *toueiFbCopyBuf[TOUEI_MAX];
-static HuVecF toueiFbCopyPos[TOUEI_MAX];
-static s16 toueiNo;
+static void *ToueiFbCopyBuf[TOUEI_MAX];
+static HuVecF ToueiFbCopyPos[TOUEI_MAX];
+static s16 ToueiNo;
 
-static char *toueiCenterObj[15] = {
+static char *ToueiCenterObj[15] = {
     "root_head",
     "root_head",
     "ske_head",
@@ -28,7 +28,7 @@ static char *toueiCenterObj[15] = {
     "ske_head",
 };
 
-static float toueiCenterOfsY[13] = {
+static float ToueiCenterOfsY[13] = {
     15,
     18,
     12,
@@ -56,10 +56,10 @@ void ToueiDispInit(void)
     HuVecF pos2D;
     s16 posX, posY;
     for(i=0; i<8; i++) {
-        toueiFbCopyBuf[i] = HuMemDirectMallocNum(HEAP_MODEL, GXGetTexBufferSize(TOUEI_FB_W, TOUEI_FB_H, GX_TF_RGB565, GX_FALSE, 0), HU_MEMNUM_OVL);
+        ToueiFbCopyBuf[i] = HuMemDirectMallocNum(HEAP_MODEL, GXGetTexBufferSize(TOUEI_FB_W, TOUEI_FB_H, GX_TF_RGB565, GX_FALSE, 0), HU_MEMNUM_OVL);
         if(i != 7) {
-            Hu3DModelObjPosGet(charToueiMdlId[i], toueiCenterObj[i], &pos3D);
-            pos3D.y += toueiCenterOfsY[i];
+            Hu3DModelObjPosGet(charToueiMdlId[i], ToueiCenterObj[i], &pos3D);
+            pos3D.y += ToueiCenterOfsY[i];
         } else {
             pos3D = Hu3DData[charToueiMdlId[i]].pos;
         }
@@ -68,13 +68,13 @@ void ToueiDispInit(void)
         posY = pos2D.y;
         posX &= 0xFFFE;
         posY &= 0xFFFE;
-        toueiFbCopyPos[i].x = posX;
-        toueiFbCopyPos[i].y = posY;
-        Hu3DModelMatHookSet(toueiMdlId[i], ToueiMatHook);
+        ToueiFbCopyPos[i].x = posX;
+        ToueiFbCopyPos[i].y = posY;
+        Hu3DModelMatHookSet(ToueiMdlId[i], ToueiMatHook);
     }
-    toueiFbCopyBuf[i] = HuMemDirectMallocNum(HEAP_MODEL, GXGetTexBufferSize(TOUEI_FB_W, TOUEI_FB_H, GX_TF_RGB565, GX_FALSE, 0), HU_MEMNUM_OVL);
-    toueiFbCopyPos[i].x = posX+TOUEI_FB_W;
-    toueiFbCopyPos[i].y = posY+TOUEI_FB_H;
+    ToueiFbCopyBuf[i] = HuMemDirectMallocNum(HEAP_MODEL, GXGetTexBufferSize(TOUEI_FB_W, TOUEI_FB_H, GX_TF_RGB565, GX_FALSE, 0), HU_MEMNUM_OVL);
+    ToueiFbCopyPos[i].x = posX+TOUEI_FB_W;
+    ToueiFbCopyPos[i].y = posY+TOUEI_FB_H;
     Hu3DLayerHookSet(0, ToueiFBCopy);
 }
 
@@ -89,10 +89,10 @@ static void ToueiFBCopy(s16 layerNo)
         s16 i;
         s16 temp;
         for(temp=i=0; i<TOUEI_MAX; i++) {
-            Hu3DFbCopyExec(toueiFbCopyPos[i].x-(TOUEI_FB_W/2), toueiFbCopyPos[i].y-(TOUEI_FB_H/2), TOUEI_FB_W, TOUEI_FB_H, GX_TF_RGB565, GX_FALSE, toueiFbCopyBuf[i]);
+            Hu3DFbCopyExec(ToueiFbCopyPos[i].x-(TOUEI_FB_W/2), ToueiFbCopyPos[i].y-(TOUEI_FB_H/2), TOUEI_FB_W, TOUEI_FB_H, GX_TF_RGB565, GX_FALSE, ToueiFbCopyBuf[i]);
         }
         ToueiZClear();
-        toueiNo = 0;
+        ToueiNo = 0;
     }
 }
 
@@ -155,7 +155,7 @@ static void ToueiMatHook(HU3DDRAWOBJ *drawObj, HSFMATERIAL *material)
             break;
         }
     }
-    GXInitTexObj(&texObj, toueiFbCopyBuf[fileselBox[i].charNo], TOUEI_FB_W, TOUEI_FB_H, GX_TF_RGB565, GX_CLAMP, GX_CLAMP, GX_FALSE);
+    GXInitTexObj(&texObj, ToueiFbCopyBuf[fileselBox[i].charNo], TOUEI_FB_W, TOUEI_FB_H, GX_TF_RGB565, GX_CLAMP, GX_CLAMP, GX_FALSE);
     GXInitTexObjLOD(&texObj, GX_LINEAR, GX_LINEAR, 0.0f, 0.0f, 0.0f, GX_FALSE, GX_FALSE, GX_ANISO_1);
     GXLoadTexObj(&texObj, GX_TEXMAP0);
     GXSetNumTexGens(1);
