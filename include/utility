@@ -1,0 +1,58 @@
+/*  <utility> -- std::pair (C++98 20.2.2).
+ *  Verified: pair() value-initializes both members (m539 setResult: 8 `li 0; stw` for pair<int,int>[4]);
+ *  pair(const T1&, const T2&) (map::insert's result, drum 71B4).  The comparison operators are the
+ *  standard definitions; retail code only compares pairs through its own functions (CompareScore).
+ */
+#ifndef _UTILITY
+#define _UTILITY
+
+namespace std {
+
+template <class T1, class T2>
+struct pair
+{
+	typedef T1 first_type;
+	typedef T2 second_type;
+
+	T1 first;
+	T2 second;
+
+	pair() : first(), second() {}
+	pair(const T1& x, const T2& y) : first(x), second(y) {}
+	template <class U, class V>
+	pair(const pair<U, V>& p) : first(p.first), second(p.second) {}
+};
+
+template <class T1, class T2>
+inline bool operator==(const pair<T1, T2>& x, const pair<T1, T2>& y)
+{
+	return x.first == y.first && x.second == y.second;
+}
+
+template <class T1, class T2>
+inline bool operator<(const pair<T1, T2>& x, const pair<T1, T2>& y)
+{
+	return x.first < y.first || (!(y.first < x.first) && x.second < y.second);
+}
+
+template <class T1, class T2>
+inline bool operator!=(const pair<T1, T2>& x, const pair<T1, T2>& y) { return !(x == y); }
+
+template <class T1, class T2>
+inline bool operator>(const pair<T1, T2>& x, const pair<T1, T2>& y) { return y < x; }
+
+template <class T1, class T2>
+inline bool operator>=(const pair<T1, T2>& x, const pair<T1, T2>& y) { return !(x < y); }
+
+template <class T1, class T2>
+inline bool operator<=(const pair<T1, T2>& x, const pair<T1, T2>& y) { return !(y < x); }
+
+template <class T1, class T2>
+inline pair<T1, T2> make_pair(T1 x, T2 y)
+{
+	return pair<T1, T2>(x, y);
+}
+
+} // namespace std
+
+#endif

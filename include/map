@@ -1,0 +1,102 @@
+/*  <map> -- Metrowerks MSL C++ std::map over __tree (<tree>), reconstructed from m539 drum.cpp
+ *  (std::map<unsigned long, CModel*>).  Only what drum uses is provided and verified: map(),
+ *  ~map(), find, end, insert, iterator ->.  Evidence: build/mp5-cpp/20260925-msl-map (check.sh).
+ *
+ *  - map::iterator is its own class holding the tree's iterator: find/end/insert results pass
+ *    through one conversion copy in retail (drum 71B4: 0xC -> 0x1C -> 0x20; 0x8 -> 0x14).
+ *  - find() builds a named value_type(key, T()) and passes it to the out-of-line __tree::find
+ *    (retail passes the temporary's address directly: `addi r5,r1,N`).
+ *  - insert() copies the tree's pair<tree::iterator, bool> and rebuilds pair<iterator, bool>
+ *    through pair(const T1&, const T2&) (retail: pair copy, then an iterator temporary).
+ *  - map() passes __value_compare() and allocator_type() temporaries (retail sp+8, sp+9).
+ */
+#ifndef _MAP
+#define _MAP
+
+#include <mslconfig>
+#include <functional>
+#include <utility>
+#include <memory>
+#include <tree>
+
+namespace std {
+
+template <class Key, class T, class Compare = less<Key>, class Allocator = allocator<pair<const Key, T> > >
+class map
+{
+public:
+	typedef Key                                 key_type;
+	typedef T                                   mapped_type;
+	typedef pair<const Key, T>                  value_type;
+	typedef Compare                             key_compare;
+	typedef Allocator                           allocator_type;
+	typedef typename Allocator::size_type       size_type;
+	typedef typename Allocator::difference_type difference_type;
+	typedef typename Allocator::reference       reference;
+	typedef typename Allocator::const_reference const_reference;
+	typedef typename Allocator::pointer         pointer;
+	typedef typename Allocator::const_pointer   const_pointer;
+
+	// the standard's value_compare (value_comp() is not provided; unverified)
+	class value_compare
+		: public binary_function<value_type, value_type, bool>
+	{
+		friend class map;
+	protected:
+		key_compare comp;
+		value_compare(key_compare c) : comp(c) {}
+	public:
+		bool operator()(const value_type& x, const value_type& y) const
+			{return comp(x.first, y.first);}
+	};
+
+private:
+	// The tree's comparison: an empty POD derived from key_compare only.  Retail copies it as
+	// one byte into the tree (drum 7AD0 `lbz/stb`), which CodeWarrior does only for a POD, and
+	// it must be empty for the 12-byte map (a second empty base, e.g. binary_function, makes
+	// CodeWarrior's compressed_pair put the begin pointer at +12).
+	struct __value_compare
+		: public key_compare
+	{
+		bool operator()(const value_type& x, const value_type& y) const
+			{return key_compare::operator()(x.first, y.first);}
+	};
+
+	typedef __tree<value_type, __value_compare, allocator_type> tree_type;
+	tree_type tree_;
+
+public:
+	class iterator
+	{
+	public:
+		iterator() {}
+		iterator(const typename tree_type::iterator& i) : i_(i) {}
+		reference operator*() const { return *i_; }
+		pointer operator->() const { return i_.operator->(); }
+		bool operator==(const iterator& y) const { return i_ == y.i_; }
+		bool operator!=(const iterator& y) const { return i_ != y.i_; }
+	private:
+		typename tree_type::iterator i_;
+	};
+
+	map() : tree_(__value_compare(), allocator_type()) {}
+
+	iterator begin() { return tree_.begin(); }
+	iterator end() { return tree_.end(); }
+	size_type size() const { return tree_.size(); }
+
+	pair<iterator, bool> insert(const value_type& x)
+	{
+		pair<typename tree_type::iterator, bool> r = tree_.insert_unique(x);
+		return pair<iterator, bool>(r.first, r.second);
+	}
+	iterator find(const key_type& x)
+	{
+		value_type v(x, mapped_type());
+		return tree_.find(v);
+	}
+};
+
+} // namespace std
+
+#endif

@@ -1,0 +1,402 @@
+/*  <algorithm> -- only the pieces <vector> inlines.  The public entry points
+ *  forward to __-prefixed workers, as MSL does; that extra inline level is
+ *  visible in the generated code (an argument that is not a plain register
+ *  variable is first evaluated into a temporary), so it must stay.
+ */
+#ifndef _ALGORITHM
+#define _ALGORITHM
+
+#include <functional>
+#include <iterator>
+
+extern "C" void* memcpy(void*, const void*, unsigned long);
+extern "C" void* memmove(void*, const void*, unsigned long);
+
+namespace std {
+
+template <class InputIterator, class OutputIterator>
+inline OutputIterator __copy(InputIterator first, InputIterator last, OutputIterator result)
+{
+	for (; first < last; ++first, ++result)
+		*result = *first;
+	return result;
+}
+
+// short (m536's vector<s16>): retail copies with memcpy/memmove and fills through unsigned short
+// (lhz/clrlwi); the int instance (m501) uses the element loops below. All four __vector_pod<s>
+// functions are masked-identical with these three overloads.
+inline short* __copy(short* first, short* last, short* result)
+{
+	int n = last - first;
+	memcpy(result, first, n * sizeof(short));
+	return result + n;
+}
+
+template <class InputIterator, class OutputIterator>
+inline OutputIterator copy(InputIterator first, InputIterator last, OutputIterator result)
+{
+	return __copy(first, last, result);
+}
+
+template <class BidirectionalIterator1, class BidirectionalIterator2>
+inline BidirectionalIterator2 __copy_backward(BidirectionalIterator1 first, BidirectionalIterator1 last, BidirectionalIterator2 result)
+{
+	while (last > first)
+		*--result = *--last;
+	return result;
+}
+
+inline short* __copy_backward(short* first, short* last, short* result)
+{
+	int n = last - first;
+	result -= n;
+	memmove(result, first, n * sizeof(short));
+	return result;
+}
+
+template <class BidirectionalIterator1, class BidirectionalIterator2>
+inline BidirectionalIterator2 copy_backward(BidirectionalIterator1 first, BidirectionalIterator1 last, BidirectionalIterator2 result)
+{
+	return __copy_backward(first, last, result);
+}
+
+template <class OutputIterator, class Size, class T>
+inline void __fill_n(OutputIterator first, Size n, const T& value)
+{
+	for (; n > 0; ++first, --n)
+		*first = value;
+}
+
+template <class Size>
+inline void __fill_n(short* first, Size n, const short& value)
+{
+	for (; n > 0; ++first, --n)
+		*reinterpret_cast<unsigned short*>(first) = reinterpret_cast<const unsigned short&>(value);
+}
+
+// min (m522 fire 2F88/4504, vector::assign's `min(n, size())`): `(b < a) ? b : a` by reference.
+template <class T>
+inline const T& min(const T& a, const T& b)
+{
+	return b < a ? b : a;
+}
+
+// max (m537 player <deque>: cdeque::push_back/insert `max(capacity, size_type(1))`): `(a < b) ? b : a` by reference.
+template <class T>
+inline const T& max(const T& a, const T& b)
+{
+	return a < b ? b : a;
+}
+
+template <class T>
+inline void __swap(T& a, T& b)
+{
+	T tmp = a;
+	a = b;
+	b = tmp;
+}
+
+template <class T>
+inline void swap(T& a, T& b)
+{
+	__swap(a, b);
+}
+
+// min_element / sort, reconstructed from m539 game_master.cpp's
+// std::sort(pair<int,int>*, pair<int,int>*, bool (*)(const pair<int,int>&, const pair<int,int>&)):
+// sort = 949C, __median_of_3 = 991C, __selection_sort = 9ABC (weak, emitted in this order).
+// __median_of_3 and __selection_sort are raw-identical; sort differs only in the evaluation order
+// of the operands of `len * 3 / 4 + rot % 5` (3 instructions, same values; build/mp5-cpp/20260925-msl-map, check.sh).
+// The worker names are not known (retail symbols are fn_1_*).
+
+template <class ForwardIterator, class Compare>
+inline ForwardIterator min_element(ForwardIterator first, ForwardIterator last, Compare comp)
+{
+	ForwardIterator result = first;
+	if (first != last)
+		for (++first; first != last; ++first)
+			if (comp(*first, *result))
+				result = first;
+	return result;
+}
+
+template <class RandomAccessIterator, class Compare>
+void __selection_sort(RandomAccessIterator first, RandomAccessIterator last, Compare comp)
+{
+	if (first != last)
+	{
+		for (RandomAccessIterator stop = last - 1; first < stop; ++first)
+		{
+			RandomAccessIterator m = min_element(first, last, comp);
+			if (m != first)
+				swap(*m, *first);
+		}
+	}
+}
+
+template <class RandomAccessIterator, class Compare>
+void __median_of_3(RandomAccessIterator a, RandomAccessIterator b, RandomAccessIterator c, Compare comp)
+{
+	bool x = !comp(*c, *a);
+	bool y = !comp(*b, *c);
+	if (x && y)
+		return;
+	if (!x && !y)
+	{
+		swap(*a, *b);
+		return;
+	}
+	if (comp(*b, *a))
+		swap(*a, *b);
+	if (x)
+		swap(*b, *c);
+	else
+		swap(*a, *c);
+}
+
+template <class RandomAccessIterator, class Compare>
+void sort(RandomAccessIterator first, RandomAccessIterator last, Compare comp)
+{
+	while (true)
+	{
+		int len = last - first;
+		if (len <= 1)
+			return;
+		if (len <= 20)
+		{
+			__selection_sort(first, last, comp);
+			return;
+		}
+		// function-local static with a guard byte (retail bss A18 + A1C)
+		static int rot = -4;
+		RandomAccessIterator i = first + (len / 4 + rot % 5);
+		if (++rot >= 5)
+			rot = -4;
+		RandomAccessIterator j = first + (len * 3 / 4 + rot % 5);
+		if (++rot >= 5)
+			rot = -4;
+		RandomAccessIterator k = last - 1;
+		__median_of_3(i, j, k, comp);
+		i = first;
+		j = k;
+		while (comp(*i, *k))
+			++i;
+		while (i != --j && !comp(*j, *k))
+			;
+		if (i < j)
+		{
+			swap(*i, *j);
+			++i;
+			while (true)
+			{
+				while (comp(*i, *k))
+					++i;
+				while (!comp(*--j, *k))
+					;
+				if (i >= j)
+					break;
+				swap(*i, *j);
+				++i;
+			}
+		}
+		if (i == first)
+		{
+			swap(*i, *k);
+			++i;
+			j = last;
+			if (!comp(*first, *--j))
+			{
+				while (i != last && !comp(*first, *i))
+					++i;
+				if (i < j)
+					swap(*i, *j);
+			}
+			if (i < j)
+			{
+				while (true)
+				{
+					while (!comp(*first, *i))
+						++i;
+					while (comp(*first, *--j))
+						;
+					if (i >= j)
+						break;
+					swap(*i, *j);
+					++i;
+				}
+			}
+			first = i;
+			continue;
+		}
+		if (i - first < last - i)
+		{
+			sort(first, i, comp);
+			first = i;
+		}
+		else
+		{
+			sort(i, last, comp);
+			last = i;
+		}
+	}
+}
+
+// 2-argument sort (__msl_less<value_type>), reconstructed from m531 flow.cpp's std::sort(unsigned*, unsigned*):
+// sort = 4BFC, __median_of_3 = 4E60, partition<.., __binder2nd_const_ref<__msl_less>> = 4F58,
+// partition<.., unary_negate<__binder1st_const_ref<__msl_less>>> = 5264, __selection_sort = 562C
+// (weak, emitted in this order).  All raw-identical except sort, which has the same 3-instruction
+// evaluation-order difference in `len * 3 / 4 + rot % 5` as the 3-argument sort above (m539 949C).
+// CW-forced spellings: partition and its helper take the predicate by const reference (by value,
+// the binder returned by bind2nd/not1 is copied once more at the call); the helper's loop exits
+// with break (a `return` inside it goes through a stack return slot); the pre-scan loops are
+// `first != --last` and `++first; while (first != last && ...)` in that operand order; the helper
+// gets an iterator tag by value (a stack temporary copied per call: 4F58 `lbz 17(r1); stb 18(r1)`).
+// Definition order sets emission order: __selection_sort defined before __median_of_3 is emitted
+// before the partitions (sort, median, selection, p, p); defined after partition, it comes last
+// as in retail.  Keep it here.
+// Worker names are not known (retail symbols are fn_1_*).
+
+template <class ForwardIterator>
+inline ForwardIterator min_element(ForwardIterator first, ForwardIterator last)
+{
+	ForwardIterator result = first;
+	if (first != last)
+		for (++first; first != last; ++first)
+			if (*first < *result)
+				result = first;
+	return result;
+}
+
+template <class RandomAccessIterator>
+void __median_of_3(RandomAccessIterator a, RandomAccessIterator b, RandomAccessIterator c)
+{
+	bool x = !(*c < *a);
+	bool y = !(*b < *c);
+	if (x && y)
+		return;
+	if (!x && !y)
+	{
+		swap(*a, *b);
+		return;
+	}
+	if (*b < *a)
+		swap(*a, *b);
+	if (x)
+		swap(*b, *c);
+	else
+		swap(*a, *c);
+}
+
+template <class BidirectionalIterator, class Predicate>
+inline BidirectionalIterator
+__partition_const(BidirectionalIterator first, BidirectionalIterator last, const Predicate& pred, bidirectional_iterator_tag)
+{
+	while (true)
+	{
+		while (pred(*first))
+			++first;
+		while (!pred(*--last))
+			;
+		if (!(first < last))
+			break;
+		swap(*first, *last);
+		++first;
+	}
+	return first;
+}
+
+template <class BidirectionalIterator, class Predicate>
+BidirectionalIterator
+partition(BidirectionalIterator first, BidirectionalIterator last, const Predicate& pred)
+{
+	if (first == last)
+		return first;
+	bool b1 = pred(*first);
+	bool b2 = !pred(*--last);
+	if (b1 && b2)
+		return __partition_const(++first, last, pred, bidirectional_iterator_tag());
+	if (b2)
+	{
+		if (first == last)
+			return first;
+		while (first != --last && !pred(*last))
+			;
+		if (first == last)
+			return first;
+	}
+	else if (b1)
+	{
+		++last;
+		++first;
+		while (first != last && pred(*first))
+			++first;
+		if (first == last)
+			return first;
+		--last;
+	}
+	swap(*first, *last);
+	return __partition_const(++first, last, pred, bidirectional_iterator_tag());
+}
+
+template <class RandomAccessIterator>
+void __selection_sort(RandomAccessIterator first, RandomAccessIterator last)
+{
+	if (first != last)
+	{
+		for (RandomAccessIterator stop = last - 1; first < stop; ++first)
+		{
+			RandomAccessIterator m = min_element(first, last);
+			if (m != first)
+				swap(*m, *first);
+		}
+	}
+}
+
+template <class RandomAccessIterator>
+void sort(RandomAccessIterator first, RandomAccessIterator last)
+{
+	typedef typename iterator_traits<RandomAccessIterator>::value_type T;
+	while (true)
+	{
+		int len = last - first;
+		if (len <= 1)
+			return;
+		if (len <= 20)
+		{
+			__selection_sort(first, last);
+			return;
+		}
+		static int rot = -4;
+		RandomAccessIterator i = first + (len / 4 + rot % 5);
+		if (++rot >= 5)
+			rot = -4;
+		RandomAccessIterator j = first + (len * 3 / 4 + rot % 5);
+		if (++rot >= 5)
+			rot = -4;
+		RandomAccessIterator k = last - 1;
+		__median_of_3(i, j, k);
+		i = partition(first, k, __bind2nd_const_ref(__msl_less<T>(), *k));
+		if (i == first)
+		{
+			swap(*i, *k);
+			++i;
+			i = partition(i, last, not1(__bind1st_const_ref(__msl_less<T>(), *first)));
+			first = i;
+			continue;
+		}
+		if (i - first < last - i)
+		{
+			sort(first, i);
+			first = i;
+		}
+		else
+		{
+			sort(i, last);
+			last = i;
+		}
+	}
+}
+
+} // namespace std
+
+#endif

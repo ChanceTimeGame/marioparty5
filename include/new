@@ -1,0 +1,4 @@
+#ifndef _NEW
+#define _NEW
+inline void* operator new(unsigned long, void* ptr) { return ptr; }
+#endif

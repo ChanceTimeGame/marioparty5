@@ -1,0 +1,314 @@
+/*  <tree> -- Metrowerks MSL C++ red-black tree (__tree), reconstructed from Mario Party 5
+ *  m539 drum.cpp's std::map<unsigned long, CModel*> (CodeWarrior GC 1.3.2, -O0,p -inline auto).
+ *  Internal header of <map>.  Every out-of-line function below is raw-identical to retail
+ *  (build/mp5-cpp/20260925-msl-map, check.sh); the spellings are load-bearing, see the notes.
+ *
+ *  Object (12 bytes):  +0 size_     compressed_pair<size_type, allocator_type>   (value_alloc() = this)
+ *                      +4 header_   compressed_pair<node_base*, node allocator>  first_ = root; end_node() = &header_
+ *                      +8 leftmost_ compressed_pair<node_base*, value_compare>   begin; the comparison is the empty base
+ *  Node (0x14):        +0 left_, +4 right_, +8 parent_ (parent pointer | color, bit 0: 1 = red), +0xC data_
+ *  The end node is the header: only its left_ (the root) exists, and the root's parent is the header,
+ *  so the rotations update the root through the parent link; the root& argument only ends the loop.
+ */
+#ifndef _TREE
+#define _TREE
+
+#include <mslconfig>
+#include <memory>
+#include <limits>
+#include <utility>
+
+namespace std {
+
+template <class T, class Compare, class Allocator>
+class __tree
+{
+public:
+	typedef T                                   value_type;
+	typedef Compare                             value_compare;
+	typedef Allocator                           allocator_type;
+	typedef typename Allocator::size_type       size_type;
+	typedef typename Allocator::difference_type difference_type;
+	typedef typename Allocator::reference       reference;
+	typedef typename Allocator::const_reference const_reference;
+	typedef typename Allocator::pointer         pointer;
+	typedef typename Allocator::const_pointer   const_pointer;
+
+	struct node_base;
+
+	// The tagged parent word.  It is an object of its own: retail reaches it through its address
+	// (`addi rX,node,8` when the node is itself a temporary), and set_parent keeps the color bit.
+	class parent_color
+	{
+	public:
+		node_base* parent() const { return (node_base*)(p_ & ~1UL); }
+		void set_parent(node_base* p) { p_ = (unsigned long)p | (p_ & 1); }
+		// x's parent, this color (the rotations' y->set_parent(x->parent()))
+		void set_parent(const parent_color& x) { p_ = (x.p_ & ~1UL) | (p_ & 1); }
+		bool is_red() const { return (bool)(p_ & 1); }
+
+		unsigned long p_;
+	};
+
+	struct node_base
+	{
+		node_base*   left_;
+		node_base*   right_;
+		parent_color parent_;
+
+		// color(): bool -> unsigned char is the second byte temporary retail shows before `== 1`.
+		unsigned char color() const { return parent_.is_red(); }
+		// Written as `p = p | 1`, not `p |= 1`: `this` is then referenced twice, which is the
+		// reference count CodeWarrior ranks register candidates by (balance_insert's allocation).
+		void set_red() { parent_.p_ = parent_.p_ | 1; }
+		void set_black() { parent_.p_ = parent_.p_ & ~1UL; }
+	};
+
+	struct node
+		: public node_base
+	{
+		value_type data_;
+	};
+
+	typedef allocator<node> node_allocator_type;
+
+	class iterator
+	{
+	public:
+		iterator() {}
+		// not explicit: find() and end() return a node pointer through this conversion, which is
+		// what puts the constructed iterator's address through a stack slot in retail.
+		iterator(node_base* n) : node_(n) {}
+		reference operator*() const { return ((node*)node_)->data_; }
+		pointer operator->() const { return &((node*)node_)->data_; }
+		bool operator==(const iterator& y) const { return node_ == y.node_; }
+		bool operator!=(const iterator& y) const { return node_ != y.node_; }
+	private:
+		node_base* node_;
+		friend class __tree;
+	};
+
+	__tree(const value_compare& comp, const allocator_type& a);
+	~__tree() { if (root()) destroy(root()); }
+
+	iterator begin() { return leftmost_.first(); }
+	iterator end() { return end_node(); }
+	size_type size() const { return size_.first(); }
+	size_type max_size() const { return numeric_limits<size_type>::max(); }
+
+	iterator find(const value_type& x);
+	pair<iterator, bool> insert_unique(const value_type& x);
+
+private:
+	Metrowerks::compressed_pair<size_type, allocator_type>        size_;		// +0
+	Metrowerks::compressed_pair<node_base*, node_allocator_type>  header_;		// +4 first_ = root
+	Metrowerks::compressed_pair<node_base*, value_compare>        leftmost_;	// +8 begin
+
+	node_base* end_node() { return (node_base*)&header_; }
+	// The cast to node*& is one more inline level (retail: `addi rA,this,4; mr rB,rA`).
+	node*& root() { return (node*&)header_.first(); }
+	allocator_type&      value_alloc() { return size_.second(); }
+	node_allocator_type& node_alloc() { return header_.second(); }
+	// The comparison is invoked as ((value_compare&)leftmost_)(a, b): an address expression
+	// that costs nothing.  An accessor returning leftmost_.second() leaves a dead `this` store.
+
+	void destroy(node_base* x);
+	node_base* insert_node_at(node_base* parent, bool left, bool leftmost, const value_type& x);
+
+	static void balance_insert(node_base* x, node_base* root);
+	static void rotate_right(node_base* x, node_base*& root);
+	static void rotate_left(node_base* x, node_base*& root);
+};
+
+template <class T, class Compare, class Allocator>
+typename __tree<T, Compare, Allocator>::iterator
+__tree<T, Compare, Allocator>::find(const value_type& x)
+{
+	node_base* n = root();
+	node_base* y = end_node();
+	while (n != 0)
+	{
+		if (!((value_compare&)leftmost_)(((node*)n)->data_, x))
+		{
+			y = n;
+			n = n->left_;
+		}
+		else
+			n = n->right_;
+	}
+	if (y == end_node() || ((value_compare&)leftmost_)(x, ((node*)y)->data_))
+		return end();
+	return y;
+}
+
+template <class T, class Compare, class Allocator>
+void
+__tree<T, Compare, Allocator>::destroy(node_base* x)
+{
+	if (x->left_ != 0)
+		destroy(x->left_);
+	if (x->right_ != 0)
+		destroy(x->right_);
+	value_alloc().destroy(&((node*)x)->data_);
+	node_alloc().deallocate((node*)x, 1);
+}
+
+template <class T, class Compare, class Allocator>
+pair<typename __tree<T, Compare, Allocator>::iterator, bool>
+__tree<T, Compare, Allocator>::insert_unique(const value_type& x)
+{
+	node_base* j = 0;
+	node_base* y = end_node();
+	node_base* n = root();
+	bool left = true;
+	bool leftmost = true;
+	while (n != 0)
+	{
+		y = n;
+		if (((value_compare&)leftmost_)(x, ((node*)n)->data_))
+		{
+			n = n->left_;
+			left = true;
+		}
+		else
+		{
+			j = y;
+			n = n->right_;
+			left = false;
+			leftmost = false;
+		}
+	}
+	if (j == 0 || ((value_compare&)leftmost_)(((node*)j)->data_, x))
+	{
+		n = insert_node_at(y, left, leftmost, x);
+		return pair<iterator, bool>(iterator(n), true);
+	}
+	return pair<iterator, bool>(iterator(j), false);
+}
+
+template <class T, class Compare, class Allocator>
+__tree<T, Compare, Allocator>::__tree(const value_compare& comp, const allocator_type& a)
+	: size_(0, a),
+	  header_(0),
+	  leftmost_(comp)
+{
+	leftmost_.first() = end_node();
+}
+
+template <class T, class Compare, class Allocator>
+typename __tree<T, Compare, Allocator>::node_base*
+__tree<T, Compare, Allocator>::insert_node_at(node_base* parent, bool left, bool leftmost, const value_type& x)
+{
+	if (size() > max_size() - 1)
+		__msl_error("tree::insert length error\n");
+	node* n = node_alloc().allocate(1);
+	value_alloc().construct(&n->data_, x);
+	n->left_ = n->right_ = 0;
+	n->parent_.set_parent(parent);
+	if (left)
+		parent->left_ = n;
+	else
+		parent->right_ = n;
+	++size_.first();
+	balance_insert(n, root());
+	if (leftmost)
+		leftmost_.first() = n;
+	return n;
+}
+
+template <class T, class Compare, class Allocator>
+void
+__tree<T, Compare, Allocator>::balance_insert(node_base* x, node_base* root)
+{
+	x->set_red();
+	while (x != root && x->parent_.parent()->color() == 1)
+	{
+		if (x->parent_.parent() == x->parent_.parent()->parent_.parent()->left_)
+		{
+			node_base* y = x->parent_.parent()->parent_.parent()->right_;
+			if (y != 0 && y->color() == 1)
+			{
+				x->parent_.parent()->set_black();
+				y->set_black();
+				x = x->parent_.parent()->parent_.parent();
+				x->set_red();
+			}
+			else
+			{
+				if (x == x->parent_.parent()->right_)
+				{
+					x = x->parent_.parent();
+					rotate_left(x, root);
+				}
+				x->parent_.parent()->set_black();
+				x->parent_.parent()->parent_.parent()->set_red();
+				rotate_right(x->parent_.parent()->parent_.parent(), root);
+			}
+		}
+		else
+		{
+			node_base* y = x->parent_.parent()->parent_.parent()->left_;
+			if (y != 0 && y->color() == 1)
+			{
+				x->parent_.parent()->set_black();
+				y->set_black();
+				x = x->parent_.parent()->parent_.parent();
+				x->set_red();
+			}
+			else
+			{
+				if (x == x->parent_.parent()->left_)
+				{
+					x = x->parent_.parent();
+					rotate_right(x, root);
+				}
+				x->parent_.parent()->set_black();
+				x->parent_.parent()->parent_.parent()->set_red();
+				rotate_left(x->parent_.parent()->parent_.parent(), root);
+			}
+		}
+	}
+	root->set_black();
+}
+
+template <class T, class Compare, class Allocator>
+void
+__tree<T, Compare, Allocator>::rotate_right(node_base* x, node_base*& root)
+{
+	node_base* y = x->left_;
+	if (root == x)
+		root = y;
+	x->left_ = y->right_;
+	if (y->right_ != 0)
+		y->right_->parent_.set_parent(x);
+	y->parent_.set_parent(x->parent_);
+	if (x == x->parent_.parent()->left_)
+		x->parent_.parent()->left_ = y;
+	else
+		x->parent_.parent()->right_ = y;
+	y->right_ = x;
+	x->parent_.set_parent(y);
+}
+
+template <class T, class Compare, class Allocator>
+void
+__tree<T, Compare, Allocator>::rotate_left(node_base* x, node_base*& root)
+{
+	node_base* y = x->right_;
+	if (root == x)
+		root = y;
+	x->right_ = y->left_;
+	if (y->left_ != 0)
+		y->left_->parent_.set_parent(x);
+	y->parent_.set_parent(x->parent_);
+	if (x == x->parent_.parent()->left_)
+		x->parent_.parent()->left_ = y;
+	else
+		x->parent_.parent()->right_ = y;
+	y->left_ = x;
+	x->parent_.set_parent(y);
+}
+
+} // namespace std
+
+#endif

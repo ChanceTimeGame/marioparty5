@@ -1,0 +1,26 @@
+/*  <limits> -- only what allocator::max_size needs. */
+#ifndef _LIMITS
+#define _LIMITS
+
+namespace std {
+
+template <class T> class numeric_limits;
+
+template <>
+class numeric_limits<unsigned long>
+{
+public:
+	static unsigned long max() { return 0xFFFFFFFFUL; }
+};
+
+// m537 <deque>: cdeque::max_size() = min(allocator max_size, numeric_limits<difference_type>::max())
+template <>
+class numeric_limits<long>
+{
+public:
+	static long max() { return 0x7FFFFFFFL; }
+};
+
+} // namespace std
+
+#endif
