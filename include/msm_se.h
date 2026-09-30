@@ -304,6 +304,16 @@
 
 #define MSM_SE_BD3_13 1512
 
+#define MSM_SE_BD4_01 1513
+#define MSM_SE_BD4_02 1514
+#define MSM_SE_BD4_03 1515
+#define MSM_SE_BD4_04 1516
+#define MSM_SE_BD4_05 1517
+#define MSM_SE_BD4_06 1518
+#define MSM_SE_BD4_07 1519
+#define MSM_SE_BD4_08 1520
+#define MSM_SE_BD4_09 1521
+
 #define MSM_SE_BD5_01 1522
 #define MSM_SE_BD5_02 1523
 #define MSM_SE_BD5_03 1524
