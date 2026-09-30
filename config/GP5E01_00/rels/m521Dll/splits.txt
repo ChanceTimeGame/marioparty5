@@ -32,14 +32,14 @@ REL/m521Dll/driver.cpp:
 	.text       start:0x0000AF00 end:0x00011520
 	.ctors      start:0x00000008 end:0x0000000C
 	.rodata     start:0x00000198 end:0x00000240
-	.data       start:0x00000230 end:0x00000538
+	.data       start:0x00000230 end:0x000004B0
 	.bss        start:0x00000A00 end:0x00000A18
 
 REL/m521Dll/gamemaster.cpp:
 	.text       start:0x00011520 end:0x000140D8
 	.ctors      start:0x0000000C end:0x00000010
 	.rodata     start:0x00000240 end:0x00000278
-	.data       start:0x00000538 end:0x00000568
+	.data       start:0x000004B0 end:0x00000568
 	.bss        start:0x00000A18 end:0x00000A88
 
 REL/m521Dll/objectsetup.cpp:

@@ -51,11 +51,15 @@ REL/m509Dll/camera.cpp:
 	.data       start:0x000033D0 end:0x00003438
 	.bss        start:0x00000068 end:0x00000088
 
+REL/m509Dll/stage.cpp:
+	.text       start:0x0000EB14 end:0x0000EE38
+	.data       start:0x00003438 end:0x000034B8
+
 REL/m509Dll/player.cpp:
-	.text       start:0x0000EB14 end:0x00012DBC
+	.text       start:0x0000EE38 end:0x00012DBC
 	.ctors      start:0x0000000C end:0x00000010
 	.rodata     start:0x000003D8 end:0x00000520
-	.data       start:0x00003438 end:0x000035B3
+	.data       start:0x000034B8 end:0x000035B3
 	.bss        start:0x00000088 end:0x000000B0
 
 REL/m509Dll/random.cpp:
