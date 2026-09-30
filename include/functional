@@ -1,0 +1,109 @@
+/*  <functional> -- the pieces <map> and <algorithm> need: unary/binary_function, less<>, not1 and
+ *  the const-reference binders of the 2-argument sort.
+ */
+#ifndef _FUNCTIONAL
+#define _FUNCTIONAL
+
+namespace std {
+
+template <class Arg, class Result>
+struct unary_function
+{
+	typedef Arg    argument_type;
+	typedef Result result_type;
+};
+
+template <class Arg1, class Arg2, class Result>
+struct binary_function
+{
+	typedef Arg1   first_argument_type;
+	typedef Arg2   second_argument_type;
+	typedef Result result_type;
+};
+
+// std::less must stay `return x < y;`: with a static_cast<bool> the map's __tree::find and
+// insert_unique (m539 drum 745C/79BC) compute the compare branchless instead of cmplw/blt.
+template <class T>
+struct less
+	: public binary_function<T, T, bool>
+{
+	bool operator()(const T& x, const T& y) const { return x < y; }
+};
+
+// The comparator of the 2-argument sort (name not known).  It is not std::less: retail truncates
+// its result with `clrlwi r0,r0,24` before storing or testing it (m531 flow 4F58/5264), which only
+// an explicit conversion to bool produces.  unary_negate returns the same way (5264).
+template <class T>
+struct __msl_less
+	: public binary_function<T, T, bool>
+{
+	bool operator()(const T& x, const T& y) const { return static_cast<bool>(x < y); }
+};
+
+// Negators and binders.  The binders used inside <algorithm>'s 2-argument sort hold a *reference*
+// to the bound value (m531 flow 4BFC stores &*k / &*first at +4 of the 8-byte binder object), so
+// they are the const-reference flavour, not C++98 binder1st/binder2nd (which copy the value).
+// Names are not known (the retail symbols are fn_1_*).
+
+template <class Predicate>
+class unary_negate
+	: public unary_function<typename Predicate::argument_type, bool>
+{
+public:
+	explicit unary_negate(const Predicate& pred) : pred_(pred) {}
+	bool operator()(const typename Predicate::argument_type& x) const { return static_cast<bool>(!pred_(x)); }
+private:
+	Predicate pred_;
+};
+
+template <class Predicate>
+inline unary_negate<Predicate> not1(const Predicate& pred)
+{
+	return unary_negate<Predicate>(pred);
+}
+
+template <class Operation>
+class __binder1st_const_ref
+	: public unary_function<typename Operation::second_argument_type, typename Operation::result_type>
+{
+public:
+	__binder1st_const_ref(const Operation& x, const typename Operation::first_argument_type& y) : op(x), value(y) {}
+	typename Operation::result_type operator()(const typename Operation::second_argument_type& x) const
+	{
+		return op(value, x);
+	}
+protected:
+	Operation op;
+	const typename Operation::first_argument_type& value;
+};
+
+template <class Operation, class T>
+inline __binder1st_const_ref<Operation> __bind1st_const_ref(const Operation& op, const T& x)
+{
+	return __binder1st_const_ref<Operation>(op, x);
+}
+
+template <class Operation>
+class __binder2nd_const_ref
+	: public unary_function<typename Operation::first_argument_type, typename Operation::result_type>
+{
+public:
+	__binder2nd_const_ref(const Operation& x, const typename Operation::second_argument_type& y) : op(x), value(y) {}
+	typename Operation::result_type operator()(const typename Operation::first_argument_type& x) const
+	{
+		return op(x, value);
+	}
+protected:
+	Operation op;
+	const typename Operation::second_argument_type& value;
+};
+
+template <class Operation, class T>
+inline __binder2nd_const_ref<Operation> __bind2nd_const_ref(const Operation& op, const T& x)
+{
+	return __binder2nd_const_ref<Operation>(op, x);
+}
+
+} // namespace std
+
+#endif
