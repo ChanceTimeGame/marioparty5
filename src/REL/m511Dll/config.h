@@ -1,0 +1,8 @@
+#ifndef M511_CONFIG_H
+#define M511_CONFIG_H
+
+#ifndef MGCPP_GAMEOBJECT_INLINE_UPDATE
+#define MGCPP_GAMEOBJECT_INLINE_UPDATE
+#endif
+
+#endif
