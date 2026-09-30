@@ -35,13 +35,12 @@ REL/m511Dll/gamemaster.cpp:
 	.ctors      start:0x00000008 end:0x0000000C
 	.rodata     start:0x000001E0 end:0x000001E8
 	.data       start:0x00000298 end:0x00000338
-	.bss        start:0x00000A18 end:0x00000A38
+	.bss        start:0x00000A18 end:0x00000A40
 
 REL/m511Dll/particle.cpp:
 	.text       start:0x00008488 end:0x00009734
 	.rodata     start:0x000001E8 end:0x00000248
 	.data       start:0x00000338 end:0x00000368
-	.bss        start:0x00000A38 end:0x00000A40
 
 REL/m511Dll/objectsetup.cpp:
 	.text       start:0x00009734 end:0x000097C8
@@ -57,13 +56,13 @@ REL/m511Dll/camera.cpp:
 REL/m511Dll/boatshadow.cpp:
 	.text       start:0x0000BD18 end:0x0000C55C
 	.rodata     start:0x00000340 end:0x00000360
-	.data       start:0x000003F0 end:0x00000438
+	.data       start:0x000003F0 end:0x00000430
 
 REL/m511Dll/stage.cpp:
 	.text       start:0x0000C55C end:0x0000D318
 	.ctors      start:0x00000010 end:0x00000014
 	.rodata     start:0x00000360 end:0x00000388
-	.data       start:0x00000438 end:0x00000478
+	.data       start:0x00000430 end:0x00000478
 	.bss        start:0x00000A78 end:0x00000A90
 
 REL/m511Dll/star.cpp:

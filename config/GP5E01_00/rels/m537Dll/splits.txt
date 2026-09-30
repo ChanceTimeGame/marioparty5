@@ -21,14 +21,14 @@ REL/m537Dll/dorrie.cpp:
 
 REL/m537Dll/effect.cpp:
 	.text       start:0x00007254 end:0x000083CC
-	.rodata     start:0x000000F8 end:0x000001F8
+	.rodata     start:0x000000F8 end:0x00000200
 	.data       start:0x000002D0 end:0x00000320
 	.bss        start:0x000009F8 end:0x00000A00
 
 REL/m537Dll/game_master.cpp:
 	.text       start:0x000083CC end:0x000088D0
 	.ctors      start:0x00000004 end:0x00000008
-	.rodata     start:0x000001F8 end:0x00000238
+	.rodata     start:0x00000200 end:0x00000238
 	.data       start:0x00000320 end:0x00000350
 	.bss        start:0x00000A00 end:0x00000A18
 
@@ -58,13 +58,13 @@ REL/m537Dll/center_obj.cpp:
 	.text       start:0x0000FF4C end:0x000125AC
 	.ctors      start:0x00000010 end:0x00000014
 	.rodata     start:0x00000528 end:0x00000600
-	.data       start:0x00000620 end:0x00000690
+	.data       start:0x00000620 end:0x00000680
 	.bss        start:0x00000A50 end:0x00000A98
 
 REL/m537Dll/water.cpp:
 	.text       start:0x000125AC end:0x000172D0
 	.rodata     start:0x00000600 end:0x00000768
-	.data       start:0x00000690 end:0x00000734
+	.data       start:0x00000680 end:0x00000734
 	.bss        start:0x00000A98 end:0x00000AA0
 
 REL/global_destructor_chain.c:
