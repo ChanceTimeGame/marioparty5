@@ -340,7 +340,7 @@ def DolphinLib(lib_name: str, objects: List[Object]) -> Dict[str, Any]:
     return {
         "lib": lib_name,
         "mw_version": "GC/1.2.5n",
-        "cflags": cflags_base,
+        "cflags": ["-i libs/dolphin/include", "-i libs/dolphin/include/dolphin", *cflags_base, "-fp_contract off"],
         "host": False,
         "objects": objects,
     }
