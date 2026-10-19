@@ -87,6 +87,13 @@ CDriver* CPlayer::CreateDriver(int pl, CPlayer* p)
 
 
 
+
+
+
+
+
+
+
 /* fn_1_15664 (291 insns, masked 0): lv = (dif + 1) / 4.0f (the fmul after the conversion), the driver through a local */
 CPlayer::CPlayer(int pl, int slot)
     : m_driver(CreateDriver(pl, this)), m_slot(slot), m_unk38(0), m_stateTimer(0), m_stunTimer(0), m_landTimer(0),

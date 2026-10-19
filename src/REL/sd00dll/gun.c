@@ -1850,45 +1850,36 @@ static void SuikaEffectDataUpdate(HU3DPARTICLEDATA *data, s32 num)
 }
 
 /* 211 insns */
+static inline void FlameEffectDataUpdate(HU3DPARTICLEDATA *data, s32 num)
+{
+    s32 i;
+    for (i = 0; i < num; i++) {
+        data[i].pos.x += data[i].vel.x;
+        data[i].pos.y += data[i].vel.y;
+        data[i].pos.z += data[i].vel.z;
+        PSVECScale(&data[i].vel, &data[i].vel, 0.9f);
+        data[i].scale *= 1.04f;
+        data[i].color.a *= 0.9f;
+    }
+    if (++data->parManId >= 60) {
+        data->time = data->parManId = 0;
+        for (i = 0; i < num; i++) {
+            data[i].scale = 0.0f;
+        }
+    }
+}
+
 static void FlameEffectUpdate(SDBULLET *bullet)
 {
     HU3DPARTICLE *particle = Hu3DData[sys->particleMdlId[3]].hookData;
     HU3DPARTICLEDATA *data = &particle->data[bullet->effectNo[3]];
     s32 unused = 0;
-    s32 i;
-    s32 j;
 
     if (data[0].time) {
-        for (i = 0; i < 8; i++) {
-            data[i].pos.x += data[i].vel.x;
-            data[i].pos.y += data[i].vel.y;
-            data[i].pos.z += data[i].vel.z;
-            PSVECScale(&data[i].vel, &data[i].vel, 0.9f);
-            data[i].scale *= 1.04f;
-            data[i].color.a *= 0.9f;
-        }
-        if (++data->parManId >= 60) {
-            data->time = data->parManId = 0;
-            for (i = 0; i < 8; i++) {
-                data[i].scale = 0.0f;
-            }
-        }
+        FlameEffectDataUpdate(data, 8);
     }
     if (data[8].time) {
-        for (j = 0; j < 8; j++) {
-            (data + 8)[j].pos.x += (data + 8)[j].vel.x;
-            (data + 8)[j].pos.y += (data + 8)[j].vel.y;
-            (data + 8)[j].pos.z += (data + 8)[j].vel.z;
-            PSVECScale(&(data + 8)[j].vel, &(data + 8)[j].vel, 0.9f);
-            (data + 8)[j].scale *= 1.04f;
-            (data + 8)[j].color.a *= 0.9f;
-        }
-        if (++data[8].parManId >= 60) {
-            data[8].time = data[8].parManId = 0;
-            for (j = 0; j < 8; j++) {
-                (data + 8)[j].scale = 0.0f;
-            }
-        }
+        FlameEffectDataUpdate(&data[8], 8);
     }
     if (data[16].time) {
         SdEffectFlameUpdate(&data[16], 48);
@@ -1945,44 +1936,35 @@ static void BulletDustImpactCreate(SDBULLET *bullet, Mtx mtx)
 }
 
 /* 203 insns */
+static inline void KillerEffectDataUpdate(HU3DPARTICLEDATA *data, s32 num)
+{
+    s32 i;
+    for (i = 0; i < num; i++) {
+        data[i].pos.x += data[i].vel.x;
+        data[i].pos.y += data[i].vel.y;
+        data[i].pos.z += data[i].vel.z;
+        PSVECScale(&data[i].vel, &data[i].vel, 0.9f);
+        data[i].scale *= 1.04f;
+        data[i].color.a *= 0.9f;
+    }
+    if (++data->parManId >= 60) {
+        data->time = data->parManId = 0;
+        for (i = 0; i < num; i++) {
+            data[i].scale = 0.0f;
+        }
+    }
+}
+
 static void KillerEffectUpdate(SDBULLET *bullet)
 {
     HU3DPARTICLE *particle = Hu3DData[sys->particleMdlId[3]].hookData;
     HU3DPARTICLEDATA *data = &particle->data[bullet->effectNo[3]];
-    s32 i;
-    s32 j;
 
     if (data[0].time) {
-        for (i = 0; i < 1; i++) {
-            data[i].pos.x += data[i].vel.x;
-            data[i].pos.y += data[i].vel.y;
-            data[i].pos.z += data[i].vel.z;
-            PSVECScale(&data[i].vel, &data[i].vel, 0.9f);
-            data[i].scale *= 1.04f;
-            data[i].color.a *= 0.9f;
-        }
-        if (++data->parManId >= 60) {
-            data->time = data->parManId = 0;
-            for (i = 0; i < 1; i++) {
-                data[i].scale = 0.0f;
-            }
-        }
+        KillerEffectDataUpdate(data, 1);
     }
     if (data[1].time) {
-        for (j = 0; j < 1; j++) {
-            (data + 1)[j].pos.x += (data + 1)[j].vel.x;
-            (data + 1)[j].pos.y += (data + 1)[j].vel.y;
-            (data + 1)[j].pos.z += (data + 1)[j].vel.z;
-            PSVECScale(&(data + 1)[j].vel, &(data + 1)[j].vel, 0.9f);
-            (data + 1)[j].scale *= 1.04f;
-            (data + 1)[j].color.a *= 0.9f;
-        }
-        if (++data[1].parManId >= 60) {
-            data[1].time = data[1].parManId = 0;
-            for (j = 0; j < 1; j++) {
-                (data + 1)[j].scale = 0.0f;
-            }
-        }
+        KillerEffectDataUpdate(&data[1], 1);
     }
 }
 

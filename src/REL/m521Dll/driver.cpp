@@ -34,6 +34,13 @@ CDriverAsPad::CDriverAsPad(int idx)
 }
 CDriver::~CDriver() {}
 /* line padding (CalcWait) */
+
+
+
+
+
+
+
 void CDriverAsPad::Get(INFO& info) /* m513 CInputPad::get (double precision); btn = A */
 {
     int padNo = m_padNo;
@@ -146,12 +153,17 @@ void CDriverAsAI::proc00(INFO& info)
 
 
 
+
+
+
+
+
+
     setProcLine(__LINE__, __PRETTY_FUNCTION__);
     if (CountDown(m_wait) || m_wait <= 0) {
         Change(&CDriverAsAI::proc01);
     } else {
-        int w = m_wait;
-        int t = w % 360;
+        int t = m_wait % 360;
         float a = M_PI * (2 * t) / 180.0;
         a = 45.0 * sin(a);
         a += m_baseYaw;
@@ -159,6 +171,7 @@ void CDriverAsAI::proc00(INFO& info)
         player->m_targetYaw = a;
     }
 }
+
 static float s_grabDist = 50.0f; /* lbl_1_data_2A8 (non-const: .data, reloaded per use) */
 void CDriverAsAI::proc01(INFO& info) /* walk to the grab point; push there; sidestep + jump when the other hand is hit */
 {   /* line padding (proc01) */
@@ -234,6 +247,10 @@ bool CDriverAsAI::IsHitOtherHand()
 void CDriverAsAI::proc02(INFO& info)
 {
     /* line padding (proc02) */
+
+
+
+
 
 
 
@@ -338,6 +355,18 @@ void CDriverAsAI::procAway(INFO& info)
 void CDriverAsAI::proc0e(INFO& info)
 {
     /* line padding (proc0e) */
+
+
+
+
+
+
+
+
+
+
+
+
 
     setProcLine(__LINE__, __PRETTY_FUNCTION__);
     CPlayer* player = m_player;

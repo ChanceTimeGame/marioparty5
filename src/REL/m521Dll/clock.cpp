@@ -262,6 +262,18 @@ int CClock::Rotate(int id, float delta)
 {
     /* line padding (Rotate) */
 
+
+
+
+
+
+
+
+
+
+
+
+
     assert(id >= 0 && id < 2);
     int ret = -1;
     float old = m_angle[id];
@@ -464,7 +476,7 @@ int CClock::GetTurnDir(int hand)
     float o = SubAngle(m_angle[hand ^ 1], m_angle[hand]);
     if (d * o >= 0.0f) {
         const float t = d;
-        if (ABS(t) > ABS(o)) d *= -1.0f;
+        if (ABS(o) < ABS(t)) d *= -1.0f;
     }
     return 0.0f == d ? 0.0f : (d < 0.0f ? -1.0f : 1.0f);
 }
@@ -474,7 +486,7 @@ float CClock::GetTurnDist(int hand)
 {
     float d = SubAngle(m_target[hand], m_angle[hand]);
     float o = SubAngle(m_angle[hand ^ 1], m_angle[hand]);
-    if (d * o < 0.0f || ABS(d) < ABS(o)) return ABS(d);
+    if (d * o < 0.0f || ABS(o) > ABS(d)) return ABS(d);
     return 360.0f - ABS(d);
 }
 
