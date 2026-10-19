@@ -52,6 +52,15 @@ union Handle {
 
 
 
+
+
+
+
+
+
+
+
+
 CHandleMan::CHandleMan(unsigned int n)
 {
     u32 i;

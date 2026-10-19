@@ -202,13 +202,17 @@ void CCamera::debugView(int pad)
     Vec move;
     Vec dolly;
     float mag;
+    float yaw;
+    float pitch;
 
     if (btn & PAD_BUTTON_Y) {
         m_up.x = 0.0f;
         m_up.y = 1.0f;
         m_up.z = 0.0f;
     }
-    rotateCamera(-4.0f * GetStickY(pad), -4.0f * GetStickX(pad));
+    yaw = -4.0f * GetStickX(pad);
+    pitch = -4.0f * GetStickY(pad);
+    rotateCamera(pitch, yaw);
     fast = btn & PAD_BUTTON_B;
     speed = fast ? 70.0f : 20.0f;
     getLookAtMtxInverse(&inv);

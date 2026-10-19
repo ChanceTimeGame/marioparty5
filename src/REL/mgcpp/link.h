@@ -38,6 +38,9 @@ public:
 /* comparator: returns true when a sorts before b. The retail symbol says void (map.txt) but the merge
  * tests the result. */
 typedef bool (*CLinkCompareFunc)(CLinkNode* a, CLinkNode* b);
+/* sortList's parameter type as retail declares it (symbol sortList__9CLinkListFPFP9CLinkNodeP9CLinkNode_v);
+ * callers cast a CLinkCompareFunc to it and sortList casts it back */
+typedef void (*CLinkSortFunc)(CLinkNode* a, CLinkNode* b);
 
 class CLinkList : public CLinkNode {
 public:
@@ -48,7 +51,7 @@ public:
     template <class T> T* begin() { return static_cast<T*>(begin()); }
     template <class T> T* last() { return static_cast<T*>(last()); }
     CLinkNode* end() { return this; }
-    void sortList(CLinkCompareFunc cmp);
+    void sortList(CLinkSortFunc cmp);
 };
 
 #endif

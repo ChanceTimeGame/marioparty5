@@ -49,7 +49,7 @@ extern const VoidFunc _ctors[];
 extern const VoidFunc _dtors[];
 void ObjectSetup(void);
 
-int _prolog(void)
+void _prolog(void)
 {
     const VoidFunc* ctors = _ctors;
     while (*ctors != 0) {
@@ -57,7 +57,6 @@ int _prolog(void)
         ctors++;
     }
     ObjectSetup();
-    return 0;
 }
 
 void _epilog(void)

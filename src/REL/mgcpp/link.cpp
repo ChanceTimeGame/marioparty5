@@ -65,14 +65,14 @@ void CLinkNode::copyLink(CLinkList* dst)
 static CLinkNode* MergeSort(CLinkCompareFunc cmp, CLinkNode* head);
 
 /* stable merge sort of the list by cmp (true when a sorts before b) */
-void CLinkList::sortList(CLinkCompareFunc cmp)
+void CLinkList::sortList(CLinkSortFunc cmp)
 {
     if (!isEmpty()) {
         CLinkNode* p;
         CLinkNode* prev;
 
         m_prev->m_next = NULL;
-        p = MergeSort(cmp, m_next);
+        p = MergeSort((CLinkCompareFunc)cmp, m_next);
         m_next = p;
         prev = this;
         while (p != NULL) {
@@ -91,8 +91,8 @@ static CLinkNode* MergeList(CLinkCompareFunc cmp, CLinkNode* a, CLinkNode* b);
 /* fn_1_19A4: sorts a NULL-terminated m_next chain (m_prev is not maintained); returns the new head */
 static CLinkNode* MergeSort(CLinkCompareFunc cmp, CLinkNode* head)
 {
-    CLinkNode* a;
     CLinkNode* b;
+    CLinkNode* a;
 
     if (head == NULL) {
         return NULL;
