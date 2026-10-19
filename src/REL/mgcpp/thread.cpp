@@ -24,33 +24,61 @@ CThread::CThread(CThreadFunc func, void* arg, u32* stack, u32 stackSize, s32 pri
 }
 
 
+/* (blank lines: the assert/OSHalt calls below stay on their retail __LINE__) */
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 /* created suspended; retail attr is OS_THREAD_ATTR_DETACH (1) from CSubThread */
 void CThread::createThread(CThreadFunc func, void* arg, u32* stack, u32 words, s32 priority, u16 attr)
 {
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     assert(priority >= OS_PRIORITY_MIN && priority <= OS_PRIORITY_MAX);
     initStack(stack, words);
     checkStackOverflow(stack, 0);
@@ -82,6 +110,14 @@ CThread::~CThread()
     }
     delete[] m_stack;
 }
+
+
+
+
+
+
+
+
 
 /* bytes of the stack never written (still STACK_MAGIC); halts if the guard was overwritten */
 u32 CThread::getStackRemain()

@@ -423,7 +423,7 @@ void CPlayer::proc_winner_move()
 
 void CPlayer::SortPlayerList()
 {
-    playerList.sortList(ComparePlayer);
+    playerList.sortList((CLinkSortFunc)ComparePlayer);
     CPlayer* p = playerList.begin<CPlayer>();
     CLinkNode* e = playerList.end();
     int top = p->m_score;

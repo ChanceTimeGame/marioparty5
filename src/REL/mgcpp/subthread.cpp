@@ -30,6 +30,37 @@ CThreadParam CSubThread::wakeupThread(CThreadParam param)
     return m_param;
 }
 
+/* (blank lines: the asserts below stay on their retail __LINE__) */
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 /* called on the thread itself: hand `param` to the waker and wait for the next wakeupThread */
 CThreadParam CSubThread::sleepThread(CThreadParam param)
 {
