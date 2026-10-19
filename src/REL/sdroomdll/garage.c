@@ -1346,8 +1346,7 @@ void fn_1_AFCC(SDMACHINEMDL *machine, u32 mesNo)
     HuSprGrpDrawNoSet(grpId, 64);
     lbl_1_bss_5DC = HuSprAnimRead(HuDataSelHeapReadNum(DATANUM(DATA_sdroom, 0x43), HU_MEMNUM_OVL, HEAP_MODEL));
     for (i = 0; i < 5; i++) {
-        modelId = Hu3DModelCreateData(DATANUM(DATA_sdroom, 0x45) + i);
-        lbl_1_bss_5EA[i] = modelId;
+        lbl_1_bss_5EA[i] = modelId = Hu3DModelCreateData(DATANUM(DATA_sdroom, 0x45) + i);
         Hu3DModelCameraSet(modelId, HU3D_CAM2);
         pos2d.x = 424.0 + lbl_1_data_1174[i][0] + lbl_1_data_119C[i][0];
         pos2d.y = 151.0 + lbl_1_data_1174[i][1] + lbl_1_data_119C[i][1];

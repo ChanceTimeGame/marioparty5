@@ -57,7 +57,7 @@ typedef struct M506Flow_s {
     float time; //0x34
     BOOL humanWinF; //0x38
     int winnerNum; //0x3C
-    u32 recordHeight; //0x40
+    s32 recordHeight; //0x40
     int humanBest; //0x44
     s8 height[M506_PLAYER_MAX]; //0x48
     s8 maxHeight[M506_PLAYER_MAX]; //0x4C

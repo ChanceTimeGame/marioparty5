@@ -413,7 +413,7 @@ float fn_1_CEC(float a, float b)
     float d = b - a;
 
     if (d < -180.0f) {
-        d = d + 360.0f;
+        d += 360.0f;
     }
     if (d > 180.0f) {
         d = d - 360.0f;

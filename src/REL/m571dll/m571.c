@@ -275,8 +275,8 @@ HU3DLIGHTID lbl_1_bss_358;
 /* asm 61-447, 379 insns. */
 void ObjectSetup(void)
 {
-    OMOBJ *obj;
     s32 i;
+    OMOBJ *obj;
     s32 j;
 
     OSReport("******* M571 ObjectSetup *********\n");
@@ -318,8 +318,7 @@ void ObjectSetup(void)
     omMakeGroupEx(lbl_1_bss_680, 0, 4);
     lbl_1_bss_354 = omGetGroupMemberListEx(lbl_1_bss_680, 0);
     for (i = 0; i < 4; i++) {
-        obj = omAddObjEx(lbl_1_bss_680, 100, 0, 0, 0, fn_1_BF4);
-        lbl_1_bss_354[i] = obj;
+        lbl_1_bss_354[i] = obj = omAddObjEx(lbl_1_bss_680, 100, 0, 0, 0, fn_1_BF4);
         obj->data = HuMemDirectMallocNum(HEAP_HEAP, sizeof(M571_PLAYER), HU_MEMNUM_OVL);
         obj->work[0] = i;
     }

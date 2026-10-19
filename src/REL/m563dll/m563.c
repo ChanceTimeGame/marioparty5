@@ -625,7 +625,8 @@ void fn_1_16FC(OMOBJ *obj)
 
     if (MgSeqModeGet() > MGSEQ_MODE_START && MgSeqModeGet() <= MGSEQ_MODE_MAIN) {
         time = MgSeqTimerValueGet();
-        time = 30 - (time / 60);
+        time = time / 60;
+        time = 30 - time;
         if (time != 0 && time < 11) {
             lbl_1_bss_70 = 0;
             lbl_1_bss_6C = 30;
@@ -1303,7 +1304,8 @@ int fn_1_3EF0(void)
 
     bigF = FALSE;
     time = MgSeqTimerValueGet();
-    time = 30 - (time / 60);
+    time = time / 60;
+    time = 30 - time;
     if (time != 0 && time < 11) {
         if (time == lbl_1_bss_40[0] && lbl_1_bss_4C == 0) {
             bigF = TRUE;
@@ -1472,7 +1474,8 @@ float fn_1_473C(float value, float range)
     }
     if (value < 0.0f) {
         value = fabs(value);
-        result = -(value + (range - 0.003921569f * value * (frand() & 0xFF)));
+        result = value + (range - 0.003921569f * value * (frand() & 0xFF));
+        result = -result;
     } else if (0.0f == value) {
         result = 0.003921569f * range * (frand() & 0xFF);
     }
@@ -1498,10 +1501,10 @@ float fn_1_4868(float a, float b)
 BOOL fn_1_49F4(HuVecF *a, float radiusA, HuVecF *b, float radiusB)
 {
     float dx;
+    float radius;
     float dy;
     float dz;
     float dist;
-    float radius;
 
     dx = a->x - b->x;
     dy = a->y - b->y;
@@ -1930,7 +1933,6 @@ void fn_1_6280(void)
 {
     HuVecF end;
     HuVecF start;
-    OMOBJ *obj;
     M563_COIN *coin;
     int side;
     int j;
@@ -1941,6 +1943,8 @@ void fn_1_6280(void)
     float time;
 
     for (side = 0; side < 4; side++) {
+        OMOBJ *obj;
+
         for (j = 0; j < 3; j++) {
             idx = lbl_1_data_1D4[side][j];
             switch (side) {

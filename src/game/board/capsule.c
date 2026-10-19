@@ -2813,8 +2813,7 @@ static void CapsulePosSelExec(void)
     MBTopWinPosGet(&winPos);
     MBTopWinPosSet(winPos.x, winPos.y-32);
     work->capsuleMasuWinId = MBWIN_NONE;
-    capsuleMes = -1;
-    capsuleMesPrev = capsuleMes;
+    capsuleMes = capsuleMesPrev = -1;
     CapsuleYajiCreate();
     while(1) {
         masuP = MBMasuGet(MASU_LAYER_DEFAULT, masuId);

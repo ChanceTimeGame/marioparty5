@@ -2082,8 +2082,8 @@ void MB4_CoinEffInit(void)
 {
     OMOBJ *obj;
     MB4_COINEFFWORK *work;
-    HU3DMODEL *modelP;
     MBEFFECT *effP;
+    HU3DMODEL *modelP;
     ANIMDATA *anim;
     int mdlId;
 
