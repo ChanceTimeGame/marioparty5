@@ -164,6 +164,7 @@ typedef struct Win_s {
 } HUWIN;
 
 extern HUWIN winData[HUWIN_MAX];
+extern s16 winPrio;
 extern void *messDataPtr;
 
 void HuWindowInit(void);
