@@ -973,7 +973,7 @@ static void M524CoinIdle(OMOBJ *obj)
     }
     obj->work[1]--;
     if(obj->work[1] == 0) {
-        Hu3DMotionTimeSet(obj->mdlId[0], frandmod(150)+50);
+        Hu3DMotionTimeSet(obj->mdlId[0], (s32)frandmod(150)+50);
     }
 }
 
