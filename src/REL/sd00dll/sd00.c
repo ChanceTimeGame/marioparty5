@@ -2093,7 +2093,7 @@ static void MachineColSeparate(SDMACHINE *machine)
         PSVECAdd(&machine->unkE8, &delta, &machine->unkE8);
         machine->unkF4 *= machine->unk104 - 1.0f;
         machine->unkF4 += rotDiff;
-        if (!(PSVECMag(&machine->unkF8) == 0.0f)) {
+        if (PSVECMag(&machine->unkF8)) {
             if (0.0f == PSVECMag(&machine->unkF8)) {
                 machine->unkF8 = (HuVecF){ 1.0f, 1.0f, 1.0f };
             }
