@@ -1398,6 +1398,9 @@ BOOL DVDCheckDisk(void)
             if (((coverReg >> 2) & 1) || (coverReg & 1)) {
                 retVal = FALSE;
             }
+            else if (ResumeFromHere) {
+                retVal = FALSE;
+            }
             else {
                 retVal = TRUE;
             }
