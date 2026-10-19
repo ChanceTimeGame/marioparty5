@@ -1005,8 +1005,8 @@ void fn_1_3424(s16 mode, s16 frameNo)
     M533_PLAYER *player[4];
     s32 i;
     float step;
-    float t;
     float s;
+    float t;
 
     for (i = 0; i < 2; i++) {
         boat[i] = lbl_1_bss_A4[i]->data;

@@ -565,8 +565,8 @@ void fn_1_5A98(void)
  */
 void fn_1_5CD4(void)
 {
-    HU3DMODEL *modelA;
     HU3DMODEL *modelB;
+    HU3DMODEL *modelA;
     s16 i;
     float panF;
     s16 pan;
@@ -1953,7 +1953,7 @@ void fn_1_C64C(s16 player)
     vec.z = pos.z-lbl_1_bss_3B0[player].pos.z;
     mag = (vec.x*vec.x)+(vec.z*vec.z);
     dist = sqrt(mag);
-    if(dist != 0.0f) {
+    if(dist) {
         vec.x = lbl_1_bss_3B0[player].pos.x+(20.0f*(vec.x/dist));
         vec.z = lbl_1_bss_3B0[player].pos.z+(20.0f*(vec.z/dist));
     } else {
@@ -1986,7 +1986,7 @@ void fn_1_CA38(s16 player, s16 no)
     vec.z -= lbl_1_bss_3B0[player].pos.z;
     mag = (vec.x*vec.x)+(vec.z*vec.z);
     dist = sqrt(mag);
-    if(dist != 0.0f) {
+    if(dist) {
         vec.x = lbl_1_bss_3B0[player].pos.x+(20.0f*(vec.x/dist));
         vec.z = lbl_1_bss_3B0[player].pos.z+(20.0f*(vec.z/dist));
     } else {
@@ -2061,7 +2061,7 @@ s16 fn_1_D0C4(s16 player, s16 wait)
                     vec.z = pos.z-lbl_1_bss_3B0[player].pos.z;
                     mag = (vec.x*vec.x)+(vec.z*vec.z);
                     dist = sqrt(mag);
-                    if(dist != 0.0f) {
+                    if(dist) {
                         vec.x = lbl_1_bss_3B0[player].pos.x+(20.0f*(vec.x/dist));
                         vec.z = lbl_1_bss_3B0[player].pos.z+(20.0f*(vec.z/dist));
                     } else {
@@ -2160,7 +2160,7 @@ s16 fn_1_D9E0(s16 player)
                 vec.z = pos.z-lbl_1_bss_3B0[player].pos.z;
                 mag = (vec.x*vec.x)+(vec.z*vec.z);
                 dist = sqrt(mag);
-                if(dist != 0.0f) {
+                if(dist) {
                     vec.x = lbl_1_bss_3B0[player].pos.x+(20.0f*(vec.x/dist));
                     vec.z = lbl_1_bss_3B0[player].pos.z+(20.0f*(vec.z/dist));
                 } else {
@@ -2247,7 +2247,7 @@ s16 fn_1_E160(s16 player, s16 no)
                 pos.z -= lbl_1_bss_3B0[player].pos.z;
                 mag = (pos.x*pos.x)+(pos.z*pos.z);
                 dist = sqrt(mag);
-                if(dist != 0.0f) {
+                if(dist) {
                     pos.x = lbl_1_bss_3B0[player].pos.x+(20.0f*(pos.x/dist));
                     pos.z = lbl_1_bss_3B0[player].pos.z+(20.0f*(pos.z/dist));
                 } else {

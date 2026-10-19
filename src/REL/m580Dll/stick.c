@@ -268,9 +268,9 @@ void fn_1_8E80(OMOBJMAN *objman, M580_STICKDATA *data)
     M580_STICK *work;
     s32 j;
     M580_STICKMOT *mot;
-    HU3DMODELID mdlId;
     s32 i;
     s32 dataNum;
+    HU3DMODELID mdlId;
 
     for (i = 0; i < data->unk000; i++) {
         obj = omAddObjEx(objman, 0x3C, 6, 6, 0, data->unk020);

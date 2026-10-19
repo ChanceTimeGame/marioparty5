@@ -3828,9 +3828,9 @@ static int MB4_CoinNearGet(HuVecF *pos, float maxDist, HuVecF *out)
 static void MB4_CoinEffInit(void)
 {
     OMOBJ *obj;
+    MBEFFECT *effP;
     MB4_COINEFFWORK *work;
     HU3DMODEL *modelP;
-    MBEFFECT *effP;
     ANIMDATA *anim;
     int mdlId;
 

@@ -4885,8 +4885,7 @@ static void MB2_YajiInit(HuVecF *pos)
         Hu3DModelCameraSet(obj->mdlId[i], 1);
         Hu3DModelAttrSet(obj->mdlId[i], HU3D_ATTR_DISPOFF);
         Hu3DModelLayerSet(obj->mdlId[i], 3);
-        z = pos->z+3*(100*HuCos(angle));
-        Hu3DModelPosSet(obj->mdlId[i], pos->x+3*(100*HuSin(angle)), 100+pos->y, z);
+        Hu3DModelPosSet(obj->mdlId[i], pos->x+3*(100*HuSin(angle)), 100+pos->y, pos->z+3*(100*HuCos(angle)));
         Hu3DModelRotSet(obj->mdlId[i], 0, angle, 0);
     }
     obj->work[0] = 1;

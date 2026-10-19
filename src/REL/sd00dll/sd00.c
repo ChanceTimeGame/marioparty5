@@ -2372,7 +2372,7 @@ static void MachineViewUpdate(s32 cameraNo, s32 a1, HuVecF a2, HuVecF a3, HuVecF
     angD = ang2 - ang1;
     distD = dist2 - dist1;
     if (a1 == 1) {
-        angD = angD * -1.0f;
+        angD *= -1.0f;
     }
     a4.y = 0.0f;
     v = (HuVecF) { 0.0f, 0.0f, dist1 + distD * a5 };

@@ -2681,11 +2681,11 @@ void fn_1_7DB4(M567_UI *ui, M567_CAM *cam, s16 type)
 /* asm 8933-9245, 281 insns. */
 void fn_1_8330(M567_UI *ui, HuVecF *pos)
 {
+    s32 count;
     M567_WORK *work = (M567_WORK *)lbl_1_bss_4->data;
     M567_CAM *cam = ui->cam;
     HuVecF pos3d;
     s32 n;
-    s32 count;
     s32 i;
     M567_NODE *node;
     M567_NODE *node2;

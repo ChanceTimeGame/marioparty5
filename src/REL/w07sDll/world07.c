@@ -337,13 +337,13 @@ void MB7Ev_Hou(int playerNo)
     MB7EV_HOU *hou;
     MB7EV_PLAYER *player;
     MASU *masu;
+    int coin;
     int emitter;
     int mdlId;
     int i;
     int masuId;
     BOOL endF;
     u32 flag;
-    int coin;
     HuVecF pos;
     HuVecF fxPos;
     HuVecF cameraPos;
