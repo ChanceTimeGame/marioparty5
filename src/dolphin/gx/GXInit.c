@@ -10,7 +10,7 @@
 void __GXInitGX();
 
 static struct __GXData_struct gxData;
-struct __GXData_struct *gx = &gxData;
+struct __GXData_struct *const __GXData = &gxData;
 // DWARF info lists all of these as "void *", but these types make more sense.
 u16 *__memReg;
 u16 *__peReg;
@@ -43,15 +43,30 @@ static void DisableWriteGatherPipe(void)
     PPCMthid2(hid2);
 }
 
-static GXTexRegion *__GXDefaultTexRegionCallback(GXTexObj *t_obj, GXTexMapID unused)
+static GXTexRegion *__GXDefaultTexRegionCallback(GXTexObj *t_obj, GXTexMapID id)
 {
-    GXTexFmt fmt = GXGetTexObjFmt(t_obj);
+    GXTexFmt fmt;
+    u8 mm;
 
-    if (fmt != GX_TF_C4 && fmt != GX_TF_C8 && fmt != GX_TF_C14X2) {
-        return &gx->TexRegions[gx->nextTexRgn++ & 7];
-    }
-    else {
-        return &gx->TexRegionsCI[gx->nextTexRgnCI++ & 3];
+    fmt = GXGetTexObjFmt(t_obj);
+    mm = GXGetTexObjMipMap(t_obj);
+    id = (GXTexMapID)(id % GX_MAX_TEXMAP);
+
+    switch (fmt) {
+        case GX_TF_RGBA8:
+            if (mm) {
+                return &gx->TexRegions2[id];
+            }
+            return &gx->TexRegions1[id];
+        case GX_TF_C4:
+        case GX_TF_C8:
+        case GX_TF_C14X2:
+            return &gx->TexRegions0[id];
+        default:
+            if (mm) {
+                return &gx->TexRegions1[id];
+            }
+            return &gx->TexRegions0[id];
     }
 }
 
@@ -166,10 +181,10 @@ GXFifoObj* GXInit(void* base, u32 size)
 		GX_WRITE_RAS_REG(reg);
 	}
 	for (i = 0; i < 8; i++)
-		GXInitTexCacheRegion(&gx->TexRegions[i], 0, i * 0x8000, 0,
+		GXInitTexCacheRegion(&gx->TexRegions0[i], 0, i * 0x8000, 0,
 		                     0x80000 + i * 0x8000, 0);
 	for (i = 0; i < 4; i++)
-		GXInitTexCacheRegion(&gx->TexRegionsCI[i], 0, (i * 2 + 8) * 0x8000, 0,
+		GXInitTexCacheRegion(&gx->TexRegions1[i], 0, (i * 2 + 8) * 0x8000, 0,
 		                     (i * 2 + 9) * 0x8000, 0);
 	for (i = 0; i < 16; i++)
 		GXInitTlutRegion(&gx->TlutRegions[i], 0xC0000 + i * 0x2000, 16);
@@ -279,7 +294,7 @@ void __GXInitGX()
     GXSetChanAmbColor(GX_COLOR1A1, black);
     GXSetChanMatColor(GX_COLOR1A1, white);
     GXInvalidateTexAll();
-    gx->nextTexRgnCI = gx->nextTexRgn = i = GX_TEVSTAGE0;
+    i = GX_TEVSTAGE0;
     GXSetTexRegionCallback((void *)__GXDefaultTexRegionCallback);
     GXSetTlutRegionCallback(__GXDefaultTlutRegionCallback);
     GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR0A0);

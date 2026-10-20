@@ -296,7 +296,7 @@ void GXInitLightColor(GXLightObj *lt_obj, GXColor color)
     obj = (struct __GXLightObjInt_struct *)lt_obj;
     CHECK_GXBEGIN(0x1A9, "GXInitLightColor");
 
-    obj->Color = (color.r << 24) | (color.g << 16) | (color.b << 8) | color.a;
+    obj->Color = *(u32 *)&color;
 }
 
 void GXGetLightColor(const GXLightObj *lt_obj, GXColor *color)
@@ -332,68 +332,49 @@ void GXGetLightColor(const GXLightObj *lt_obj, GXColor *color)
 #define WRITE_SOME_LIGHT_REG2(val, addr) GX_WRITE_F32(val)
 #endif
 
+static inline void PushLight(const register struct __GXLightObjInt_struct *lt_obj, register void *dest)
+{
+    register u32 zero, color;
+    register f32 a0_a1, a2_k0, k1_k2, lpx_lpy, lpz_dx, dy_dz;
+
+    asm {
+        lwz    color, 12(lt_obj)
+        xor    zero, zero, zero
+        psq_l  a0_a1, 16(lt_obj), 0, 0
+        psq_l  a2_k0, 24(lt_obj), 0, 0
+        psq_l  k1_k2, 32(lt_obj), 0, 0
+        psq_l  lpx_lpy, 40(lt_obj), 0, 0
+        psq_l  lpz_dx, 48(lt_obj), 0, 0
+        psq_l  dy_dz, 56(lt_obj), 0, 0
+        stw    zero, 0(dest)
+        stw    zero, 0(dest)
+        stw    zero, 0(dest)
+        stw    color, 0(dest)
+        psq_st a0_a1, 0(dest), 0, 0
+        psq_st a2_k0, 0(dest), 0, 0
+        psq_st k1_k2, 0(dest), 0, 0
+        psq_st lpx_lpy, 0(dest), 0, 0
+        psq_st lpz_dx, 0(dest), 0, 0
+        psq_st dy_dz, 0(dest), 0, 0
+    }
+}
+
 void GXLoadLightObjImm(GXLightObj *lt_obj, GXLightID light)
 {
-    unsigned long addr;
-    unsigned long idx;
+    u32 addr;
+    u32 idx;
     struct __GXLightObjInt_struct *obj;
 
     ASSERTMSGLINE(0x1C9, lt_obj != NULL, "Light Object Pointer is null");
     obj = (struct __GXLightObjInt_struct *)lt_obj;
     CHECK_GXBEGIN(0x1CA, "GXLoadLightObjImm");
 
-    switch (light) {
-        case GX_LIGHT0:
-            idx = 0;
-            break;
-        case GX_LIGHT1:
-            idx = 1;
-            break;
-        case GX_LIGHT2:
-            idx = 2;
-            break;
-        case GX_LIGHT3:
-            idx = 3;
-            break;
-        case GX_LIGHT4:
-            idx = 4;
-            break;
-        case GX_LIGHT5:
-            idx = 5;
-            break;
-        case GX_LIGHT6:
-            idx = 6;
-            break;
-        case GX_LIGHT7:
-            idx = 7;
-            break;
-        default:
-            idx = 0;
-            ASSERTMSGLINE(0x1DA, 0, "GXLoadLightStateImm: Invalid Light Id");
-            break;
-    }
-
+    idx = 31 - __cntlzw(light);
+    idx &= 7;
     addr = idx * 0x10 + 0x600;
     GX_WRITE_U8(0x10);
     GX_WRITE_U32(addr | 0xF0000);
-
-    WRITE_SOME_LIGHT_REG1(0, addr);
-    WRITE_SOME_LIGHT_REG1(0, addr + 1);
-    WRITE_SOME_LIGHT_REG1(0, addr + 2);
-    WRITE_SOME_LIGHT_REG1(obj->Color, addr + 3);
-    WRITE_SOME_LIGHT_REG2(obj->a[0], addr + 4);
-    WRITE_SOME_LIGHT_REG2(obj->a[1], addr + 5);
-    WRITE_SOME_LIGHT_REG2(obj->a[2], addr + 6);
-    WRITE_SOME_LIGHT_REG2(obj->k[0], addr + 7);
-    WRITE_SOME_LIGHT_REG2(obj->k[1], addr + 8);
-    WRITE_SOME_LIGHT_REG2(obj->k[2], addr + 9);
-    WRITE_SOME_LIGHT_REG2(obj->lpos[0], addr + 10);
-    WRITE_SOME_LIGHT_REG2(obj->lpos[1], addr + 11);
-    WRITE_SOME_LIGHT_REG2(obj->lpos[2], addr + 12);
-    WRITE_SOME_LIGHT_REG2(obj->ldir[0], addr + 13);
-    WRITE_SOME_LIGHT_REG2(obj->ldir[1], addr + 14);
-    WRITE_SOME_LIGHT_REG2(obj->ldir[2], addr + 15);
-
+    PushLight(obj, (void *)GX_FIFO_ADDR);
     gx->bpSentNot = 1;
 }
 
@@ -451,55 +432,37 @@ void GXLoadLightObjIndx(u32 lt_obj_indx, GXLightID light)
 
 void GXSetChanAmbColor(GXChannelID chan, GXColor amb_color)
 {
-    u32 reg = 0;
+    u32 reg;
     u32 colIdx;
-    u32 alpha;
-
-    CHECK_GXBEGIN(0x239, "GXSetChanAmbColor");
 
     switch (chan) {
         case GX_COLOR0:
-            alpha = gx->ambColor[0] & 0xFF;
-            SET_REG_FIELD(0x23E, reg, 8, 0, alpha);
-            SET_REG_FIELD(0x23F, reg, 8, 8, amb_color.b);
-            SET_REG_FIELD(0x240, reg, 8, 16, amb_color.g);
-            SET_REG_FIELD(0x241, reg, 8, 24, amb_color.r);
+            reg = (*(u32 *)&amb_color & 0xFFFFFF00) | (gx->ambColor[0] & 0xFF);
             colIdx = 0;
             break;
         case GX_COLOR1:
-            alpha = gx->ambColor[1] & 0xFF;
-            SET_REG_FIELD(0x247, reg, 8, 0, alpha);
-            SET_REG_FIELD(0x248, reg, 8, 8, amb_color.b);
-            SET_REG_FIELD(0x249, reg, 8, 16, amb_color.g);
-            SET_REG_FIELD(0x24A, reg, 8, 24, amb_color.r);
+            reg = (*(u32 *)&amb_color & 0xFFFFFF00) | (gx->ambColor[1] & 0xFF);
             colIdx = 1;
             break;
         case GX_ALPHA0:
             reg = gx->ambColor[0];
-            SET_REG_FIELD(0x250, reg, 8, 0, amb_color.a);
+            SET_REG_FIELD(0, reg, 8, 0, amb_color.a);
             colIdx = 0;
             break;
         case GX_ALPHA1:
             reg = gx->ambColor[1];
-            SET_REG_FIELD(0x256, reg, 8, 0, amb_color.a);
+            SET_REG_FIELD(0, reg, 8, 0, amb_color.a);
             colIdx = 1;
             break;
         case GX_COLOR0A0:
-            SET_REG_FIELD(0x25B, reg, 8, 0, amb_color.a);
-            SET_REG_FIELD(0x25C, reg, 8, 8, amb_color.b);
-            SET_REG_FIELD(0x25D, reg, 8, 16, amb_color.g);
-            SET_REG_FIELD(0x25E, reg, 8, 24, amb_color.r);
+            reg = *(u32 *)&amb_color;
             colIdx = 0;
             break;
         case GX_COLOR1A1:
-            SET_REG_FIELD(0x263, reg, 8, 0, amb_color.a);
-            SET_REG_FIELD(0x264, reg, 8, 8, amb_color.b);
-            SET_REG_FIELD(0x265, reg, 8, 16, amb_color.g);
-            SET_REG_FIELD(0x266, reg, 8, 24, amb_color.r);
+            reg = *(u32 *)&amb_color;
             colIdx = 1;
             break;
         default:
-            ASSERTMSGLINE(0x26B, 0, "GXSetChanAmbColor: Invalid Channel Id");
             return;
     }
 
@@ -510,55 +473,37 @@ void GXSetChanAmbColor(GXChannelID chan, GXColor amb_color)
 
 void GXSetChanMatColor(GXChannelID chan, GXColor mat_color)
 {
-    u32 reg = 0;
-    u32 alpha;
+    u32 reg;
     u32 colIdx;
-
-    CHECK_GXBEGIN(0x28A, "GXSetChanMatColor");
 
     switch (chan) {
         case GX_COLOR0:
-            alpha = gx->matColor[0] & 0xFF;
-            SET_REG_FIELD(0x28F, reg, 8, 0, alpha);
-            SET_REG_FIELD(0x290, reg, 8, 8, mat_color.b);
-            SET_REG_FIELD(0x291, reg, 8, 16, mat_color.g);
-            SET_REG_FIELD(0x292, reg, 8, 24, mat_color.r);
+            reg = (*(u32 *)&mat_color & 0xFFFFFF00) | (gx->matColor[0] & 0xFF);
             colIdx = 0;
             break;
         case GX_COLOR1:
-            alpha = gx->matColor[1] & 0xFF;
-            SET_REG_FIELD(0x298, reg, 8, 0, alpha);
-            SET_REG_FIELD(0x299, reg, 8, 8, mat_color.b);
-            SET_REG_FIELD(0x29A, reg, 8, 16, mat_color.g);
-            SET_REG_FIELD(0x29B, reg, 8, 24, mat_color.r);
+            reg = (*(u32 *)&mat_color & 0xFFFFFF00) | (gx->matColor[1] & 0xFF);
             colIdx = 1;
             break;
         case GX_ALPHA0:
             reg = gx->matColor[0];
-            SET_REG_FIELD(0x2A1, reg, 8, 0, mat_color.a);
+            SET_REG_FIELD(0, reg, 8, 0, mat_color.a);
             colIdx = 0;
             break;
         case GX_ALPHA1:
             reg = gx->matColor[1];
-            SET_REG_FIELD(0x2A7, reg, 8, 0, mat_color.a);
+            SET_REG_FIELD(0, reg, 8, 0, mat_color.a);
             colIdx = 1;
             break;
         case GX_COLOR0A0:
-            SET_REG_FIELD(0x2AC, reg, 8, 0, mat_color.a);
-            SET_REG_FIELD(0x2AD, reg, 8, 8, mat_color.b);
-            SET_REG_FIELD(0x2AE, reg, 8, 16, mat_color.g);
-            SET_REG_FIELD(0x2AF, reg, 8, 24, mat_color.r);
+            reg = *(u32 *)&mat_color;
             colIdx = 0;
             break;
         case GX_COLOR1A1:
-            SET_REG_FIELD(0x2B4, reg, 8, 0, mat_color.a);
-            SET_REG_FIELD(0x2B5, reg, 8, 8, mat_color.b);
-            SET_REG_FIELD(0x2B6, reg, 8, 16, mat_color.g);
-            SET_REG_FIELD(0x2B7, reg, 8, 24, mat_color.r);
+            reg = *(u32 *)&mat_color;
             colIdx = 1;
             break;
         default:
-            ASSERTMSGLINE(0x2BC, 0, "GXSetChanMatColor: Invalid Channel Id");
             return;
     }
 
@@ -579,42 +524,32 @@ void GXSetNumChans(u8 nChans)
 
 void GXSetChanCtrl(GXChannelID chan, GXBool enable, GXColorSrc amb_src, GXColorSrc mat_src, u32 light_mask, GXDiffuseFn diff_fn, GXAttnFn attn_fn)
 {
-    u32 reg; // r31
-    u32 idx; // r26
+    u32 reg;
+    u32 idx;
 
     CHECK_GXBEGIN(0x2F8, "GXSetChanCtrl");
 
-    ASSERTMSGLINE(0x2FB, chan >= 0 && chan <= 5, "GXSetChanCtrl: Invalid Channel Id");
-
-    if (chan == 4)
-        idx = 0;
-    else if (chan == 5)
-        idx = 1;
-    else
-        idx = chan;
+    idx = chan & 0x3;
 
     reg = 0;
     SET_REG_FIELD(0x302, reg, 1, 1, enable);
     SET_REG_FIELD(0x303, reg, 1, 0, mat_src);
     SET_REG_FIELD(0x304, reg, 1, 6, amb_src);
-    SET_REG_FIELD(0x305, reg, 1, 2, (light_mask & GX_LIGHT0) != 0);
-    SET_REG_FIELD(0x306, reg, 1, 3, (light_mask & GX_LIGHT1) != 0);
-    SET_REG_FIELD(0x307, reg, 1, 4, (light_mask & GX_LIGHT2) != 0);
-    SET_REG_FIELD(0x308, reg, 1, 5, (light_mask & GX_LIGHT3) != 0);
-    SET_REG_FIELD(0x309, reg, 1, 11, (light_mask & GX_LIGHT4) != 0);
-    SET_REG_FIELD(0x30A, reg, 1, 12, (light_mask & GX_LIGHT5) != 0);
-    SET_REG_FIELD(0x30B, reg, 1, 13, (light_mask & GX_LIGHT6) != 0);
-    SET_REG_FIELD(0x30C, reg, 1, 14, (light_mask & GX_LIGHT7) != 0);
-    SET_REG_FIELD(0x30E, reg, 2, 7, (attn_fn == 0) ? 0 : diff_fn);
-    SET_REG_FIELD(0x30F, reg, 1, 9, (attn_fn != 2));
-    SET_REG_FIELD(0x310, reg, 1, 10, (attn_fn != 0));
+    if (attn_fn == GX_AF_NONE) {
+        diff_fn = GX_DF_NONE;
+    }
+    SET_REG_FIELD(0x30E, reg, 2, 7, diff_fn);
+    SET_REG_FIELD(0x30F, reg, 1, 9, (attn_fn != GX_AF_SPEC));
+    SET_REG_FIELD(0x310, reg, 1, 10, (attn_fn != GX_AF_NONE));
+    reg = (reg & ~0x3C) | ((light_mask << 2) & 0x3C);
+    reg = (reg & ~0x7800) | ((light_mask << 7) & 0x7800);
 
     GX_WRITE_XF_REG(idx + 14, reg);
-    gx->bpSentNot = 1;
     if (chan == GX_COLOR0A0) {
         GX_WRITE_XF_REG(16, reg);
     }
     else if (chan == GX_COLOR1A1) {
         GX_WRITE_XF_REG(17, reg);
     }
+    gx->bpSentNot = 1;
 }

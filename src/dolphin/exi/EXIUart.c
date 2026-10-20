@@ -126,6 +126,7 @@ static int QueueLength(void)
 
 u32 WriteUARTN(const void *buf, unsigned long len)
 {
+    BOOL enabled;
     u32 cmd;
     int qLen;
     long xLen;
@@ -136,8 +137,10 @@ u32 WriteUARTN(const void *buf, unsigned long len)
     if (Enabled != EXI_MAGIC)
         return 2;
 
+    enabled = OSDisableInterrupts();
     locked = EXILock(Chan, Dev, 0);
     if (!locked) {
+        OSRestoreInterrupts(enabled);
         return 0;
     }
 
@@ -180,5 +183,6 @@ u32 WriteUARTN(const void *buf, unsigned long len)
     }
 
     EXIUnlock(Chan);
+    OSRestoreInterrupts(enabled);
     return error;
 }

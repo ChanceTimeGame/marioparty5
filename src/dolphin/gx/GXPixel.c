@@ -165,45 +165,61 @@ void GXSetFogRangeAdj(GXBool enable, u16 center, const GXFogAdjTable *table)
 
 void GXSetBlendMode(GXBlendMode type, GXBlendFactor src_factor, GXBlendFactor dst_factor, GXLogicOp op)
 {
-    CHECK_GXBEGIN(0x177, "GXSetBlendMode");
+    u32 reg;
 
-    SET_REG_FIELD(0x135, gx->cmode0, 1, 0, (type == GX_BM_BLEND || type == GX_BM_SUBTRACT));
-    SET_REG_FIELD(0x136, gx->cmode0, 1, 11, (type == GX_BM_SUBTRACT));
-    SET_REG_FIELD(0x138, gx->cmode0, 1, 1, (type == GX_BM_LOGIC));
-    SET_REG_FIELD(0x139, gx->cmode0, 4, 12, op);
-    SET_REG_FIELD(0x13A, gx->cmode0, 3, 8, src_factor);
-    SET_REG_FIELD(0x13B, gx->cmode0, 3, 5, dst_factor);
-    SET_REG_FIELD(0x13C, gx->cmode0, 8, 24, 0x41);
-    GX_WRITE_RAS_REG(gx->cmode0);
+    CHECK_GXBEGIN(0x177, "GXSetBlendMode");
+    reg = gx->cmode0;
+
+    SET_REG_FIELD(0x136, reg, 1, 11, (type == GX_BM_SUBTRACT));
+    SET_REG_FIELD(0x135, reg, 1, 0, type);
+    SET_REG_FIELD(0x138, reg, 1, 1, (type == GX_BM_LOGIC));
+    SET_REG_FIELD(0x139, reg, 4, 12, op);
+    SET_REG_FIELD(0x13A, reg, 3, 8, src_factor);
+    SET_REG_FIELD(0x13B, reg, 3, 5, dst_factor);
+    GX_WRITE_RAS_REG(reg);
+    gx->cmode0 = reg;
     gx->bpSentNot = 0;
 }
 
 void GXSetColorUpdate(GXBool update_enable)
 {
-    CHECK_GXBEGIN(0x1A3, "GXSetColorUpdate");
+    u32 reg;
 
-    SET_REG_FIELD(0x150, gx->cmode0, 1, 3, update_enable);
-    GX_WRITE_RAS_REG(gx->cmode0);
+    CHECK_GXBEGIN(0x1A3, "GXSetColorUpdate");
+    reg = gx->cmode0;
+
+    SET_REG_FIELD(0x150, reg, 1, 3, update_enable);
+    GX_WRITE_RAS_REG(reg);
+    gx->cmode0 = reg;
     gx->bpSentNot = 0;
 }
 
 void GXSetAlphaUpdate(GXBool update_enable)
 {
-    CHECK_GXBEGIN(0x1B0, "GXSetAlphaUpdate");
+    u32 reg;
 
-    SET_REG_FIELD(0x159, gx->cmode0, 1, 4, update_enable);
-    GX_WRITE_RAS_REG(gx->cmode0);
+    CHECK_GXBEGIN(0x1B0, "GXSetAlphaUpdate");
+    reg = gx->cmode0;
+
+    SET_REG_FIELD(0x159, reg, 1, 4, update_enable);
+    GX_WRITE_RAS_REG(reg);
+    gx->cmode0 = reg;
     gx->bpSentNot = 0;
 }
 
 void GXSetZMode(GXBool compare_enable, GXCompare func, GXBool update_enable)
 {
+    u32 reg;
+
     CHECK_GXBEGIN(0x1CB, "GXSetZMode");
 
-    SET_REG_FIELD(0x171, gx->zmode, 1, 0, compare_enable);
-    SET_REG_FIELD(0x172, gx->zmode, 3, 1, func);
-    SET_REG_FIELD(0x173, gx->zmode, 1, 4, update_enable);
-    GX_WRITE_RAS_REG(gx->zmode);
+    reg = gx->zmode;
+
+    SET_REG_FIELD(0x171, reg, 1, 0, compare_enable);
+    SET_REG_FIELD(0x172, reg, 3, 1, func);
+    SET_REG_FIELD(0x173, reg, 1, 4, update_enable);
+    GX_WRITE_RAS_REG(reg);
+    gx->zmode = reg;
     gx->bpSentNot = 0;
 }
 
@@ -246,20 +262,29 @@ void GXSetPixelFmt(GXPixelFmt pix_fmt, GXZFmt16 z_fmt)
 
 void GXSetDither(GXBool dither)
 {
+    u32 reg;
+
     CHECK_GXBEGIN(0x22C, "GXSetDither");
 
-    SET_REG_FIELD(0x1CE, gx->cmode0, 1, 2, dither);
-    GX_WRITE_RAS_REG(gx->cmode0);
+    reg = gx->cmode0;
+
+    SET_REG_FIELD(0x1CE, reg, 1, 2, dither);
+    GX_WRITE_RAS_REG(reg);
+    gx->cmode0 = reg;
     gx->bpSentNot = 0;
 }
 
 void GXSetDstAlpha(GXBool enable, u8 alpha)
 {
-    CHECK_GXBEGIN(0x245, "GXSetDstAlpha");
+    u32 reg;
 
-    SET_REG_FIELD(0x1E2, gx->cmode1, 8, 0, alpha);
-    SET_REG_FIELD(0x1E3, gx->cmode1, 1, 8, enable);
-    GX_WRITE_RAS_REG(gx->cmode1);
+    CHECK_GXBEGIN(0x245, "GXSetDstAlpha");
+    reg = gx->cmode1;
+
+    SET_REG_FIELD(0x1E2, reg, 8, 0, alpha);
+    SET_REG_FIELD(0x1E3, reg, 1, 8, enable);
+    GX_WRITE_RAS_REG(reg);
+    gx->cmode1 = reg;
     gx->bpSentNot = 0;
 }
 

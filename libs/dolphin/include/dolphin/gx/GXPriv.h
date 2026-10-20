@@ -181,7 +181,7 @@ do { \
 #define SET_REG_FIELD(line, reg, size, shift, val) \
 do { \
     ASSERTMSGLINE(line, ((u32)(val) & ~((1 << (size)) - 1)) == 0, "GX Internal: Register field out of range"); \
-    (reg) = ((u32)(reg) & ~(((1 << (size)) - 1) << (shift))) | ((u32)(val) << (shift)); \
+    (reg) = (u32)__rlwimi((u32)(reg), (val), (shift), (32 - (shift) - (size)), (31 - (shift))); \
 } while (0)
 
 #define GX_REG_ASSERT(c) ASSERTMSG(c, "GX Internal: Register field out of range")
@@ -528,10 +528,9 @@ typedef struct __GXData_struct {
   u32 cpTex;
   GXBool cpTexZ;
   u32 genMode;
-  GXTexRegion TexRegions[8];
-  GXTexRegion TexRegionsCI[4];
-  u32 nextTexRgn;
-  u32 nextTexRgnCI;
+  GXTexRegion TexRegions0[8];
+  GXTexRegion TexRegions1[8];
+  GXTexRegion TexRegions2[8];
   GXTlutRegion TlutRegions[20];
   GXTexRegion* (*texRegionCallback)(GXTexObj*, GXTexMapID);
   GXTlutRegion* (*tlutRegionCallback)(u32);
@@ -546,8 +545,8 @@ typedef struct __GXData_struct {
   f32 vpHt;
   f32 vpNearz;
   f32 vpFarz;
-  u8 fgRange;
-  f32 fgSideX;
+  f32 zOffset;
+  f32 zScale;
   u32 tImage0[8];
   u32 tMode0[8];
   u32 texmapId[16];
@@ -562,12 +561,12 @@ typedef struct __GXData_struct {
   u32 dirtyState;
 } GXData;
 
-extern GXData* gx;
+extern GXData* const __GXData;
 extern u16 *__memReg;
 extern u16 *__peReg;
 extern u16 *__cpReg;
 extern u32 *__piReg;
-// #define gx __GXData
+#define gx __GXData
 
 /* GXMisc.c */
 
