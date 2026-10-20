@@ -53,7 +53,7 @@ static void GXBreakPointHandler(s16 interrupt, OSContext *context)
 {
 	OSContext exceptionContext;
 
-	gx->cpEnable = gx->cpEnable & 0xFFFFFFDF;
+	SET_REG_FIELD(0, gx->cpEnable, 1, 5, 0);
 	__cpReg[1]   = gx->cpEnable;
 	if (BreakPointCB != NULL) {
 		OSClearContext(&exceptionContext);
@@ -171,7 +171,7 @@ void GXSetCPUFifo(GXFifoObj *fifo)
         __piReg[5] = reg;
     }
 
-    __sync();
+    PPCSync();
 
     OSRestoreInterrupts(enabled);
 }
@@ -200,7 +200,7 @@ void GXSetGPFifo(GXFifoObj *fifo)
     GX_SET_CP_REG(21, (u32)realFifo->hiWatermark >> 16);
     GX_SET_CP_REG(23, (u32)realFifo->loWatermark >> 16);
 
-    __sync();
+    PPCSync();
 
     if (CPUFifo == GPFifo) {
         CPGPLinked = GX_TRUE;
@@ -442,9 +442,16 @@ void __GXInsaneWatermark(void)
 void __GXCleanGPFifo(void)
 {
     GXFifoObj dummyFifo;
-    GXFifoObj *gpFifo = GXGetGPFifo();
-    GXFifoObj *cpuFifo = GXGetCPUFifo();
-    void *base = GXGetFifoBase(gpFifo);
+    GXFifoObj *gpFifo;
+    GXFifoObj *cpuFifo;
+    void *base;
+
+    gpFifo = GXGetGPFifo();
+    if (!gpFifo) {
+        return;
+    }
+    cpuFifo = GXGetCPUFifo();
+    base = GXGetFifoBase(gpFifo);
 
     dummyFifo = *gpFifo;
     GXInitFifoPtrs(&dummyFifo, base, base);

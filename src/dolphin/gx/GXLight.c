@@ -116,32 +116,32 @@ void GXInitLightSpot(GXLightObj *lt_obj, f32 cutoff, GXSpotFn spot_func)
             a2 = 0.0f;
             break;
         case GX_SP_COS:
-            a0 = -cr / (1.0f - cr);
             a1 = 1.0f / (1.0f - cr);
+            a0 = -cr * a1;
             a2 = 0.0f;
             break;
         case GX_SP_COS2:
-            a0 = 0.0f;
-            a1 = -cr / (1.0f - cr);
             a2 = 1.0f / (1.0f - cr);
+            a1 = -cr * a2;
+            a0 = 0.0f;
             break;
         case GX_SP_SHARP:
-            d = (1.0f - cr) * (1.0f - cr);
-            a0 = (cr * (cr - 2.0f)) / d;
-            a1 = 2.0f / d;
-            a2 = -1.0f / d;
+            d = 1.0f / ((1.0f - cr) * (1.0f - cr));
+            a0 = cr * (cr - 2.0f) * d;
+            a1 = 2.0f * d;
+            a2 = -d;
             break;
         case GX_SP_RING1:
-            d = (1.0f - cr) * (1.0f - cr);
-            a0 = (-4.0f * cr) / d;
-            a1 = (4.0f * (1.0f + cr)) / d;
-            a2 = -4.0f / d;
+            d = 1.0f / ((1.0f - cr) * (1.0f - cr));
+            a2 = -4.0f * d;
+            a0 = a2 * cr;
+            a1 = 4.0f * (1.0f + cr) * d;
             break;
         case GX_SP_RING2:
-            d = (1.0f - cr) * (1.0f - cr);
-            a0 = 1.0f - ((2.0f * cr * cr) / d);
-            a1 = (4.0f * cr) / d;
-            a2 = -2.0f / d;
+            d = 1.0f / ((1.0f - cr) * (1.0f - cr));
+            a0 = 1.0f - 2.0f * cr * cr * d;
+            a1 = 4.0f * cr * d;
+            a2 = -2.0f * d;
             break;
         case GX_SP_OFF:
         default:
@@ -263,13 +263,16 @@ void GXInitSpecularDir(GXLightObj *lt_obj, f32 nx, f32 ny, f32 nz)
     vx = -nx;
     vy = -ny;
     vz = -nz + 1.0f;
-    mag = 1.0f / sqrtf((vx * vx) + (vy * vy) + (vz * vz));
+    mag = (vx * vx) + (vy * vy) + (vz * vz);
+    if (mag != 0.0f) {
+        mag = 1.0f / sqrtf(mag);
+    }
     obj->ldir[0] = vx * mag;
     obj->ldir[1] = vy * mag;
     obj->ldir[2] = vz * mag;
-    obj->lpos[0] = -nx * 1048576.0f;
-    obj->lpos[1] = -ny * 1048576.0f;
-    obj->lpos[2] = -nz * 1048576.0f;
+    obj->lpos[0] = nx * -1.0e18f;
+    obj->lpos[1] = ny * -1.0e18f;
+    obj->lpos[2] = nz * -1.0e18f;
 }
 
 void GXInitSpecularDirHA(GXLightObj *lt_obj, f32 nx, f32 ny, f32 nz, f32 hx, f32 hy, f32 hz)
@@ -283,9 +286,9 @@ void GXInitSpecularDirHA(GXLightObj *lt_obj, f32 nx, f32 ny, f32 nz, f32 hx, f32
     obj->ldir[0] = hx;
     obj->ldir[1] = hy;
     obj->ldir[2] = hz;
-    obj->lpos[0] = -nx * 1048576.0f;
-    obj->lpos[1] = -ny * 1048576.0f;
-    obj->lpos[2] = -nz * 1048576.0f;
+    obj->lpos[0] = nx * -1.0e18f;
+    obj->lpos[1] = ny * -1.0e18f;
+    obj->lpos[2] = nz * -1.0e18f;
 }
 
 void GXInitLightColor(GXLightObj *lt_obj, GXColor color)

@@ -557,6 +557,7 @@ typedef struct __GXData_struct {
   u32 perfSel;
   GXBool inDispList;
   GXBool dlSaveContext;
+  GXBool abtWaitPECopy;
   u8 dirtyVAT;
   u32 dirtyState;
 } GXData;

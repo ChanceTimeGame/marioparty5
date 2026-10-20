@@ -19,18 +19,11 @@ static void __GXXfVtxSpecs(void)
     u32 nTex;
     u32 reg;
 
-    nCols = GET_REG_FIELD(gx->vcdLo, 2, 13) ? 1 : 0;
-    nCols += GET_REG_FIELD(gx->vcdLo, 2, 15) ? 1 : 0;
     nNrm = gx->hasBiNrms ? 2 : gx->hasNrms ? 1 : 0;
-    nTex = 0;
-    nTex += GET_REG_FIELD(gx->vcdHi, 2, 0) ? 1 : 0;
-    nTex += GET_REG_FIELD(gx->vcdHi, 2, 2) ? 1 : 0;
-    nTex += GET_REG_FIELD(gx->vcdHi, 2, 4) ? 1 : 0;
-    nTex += GET_REG_FIELD(gx->vcdHi, 2, 6) ? 1 : 0;
-    nTex += GET_REG_FIELD(gx->vcdHi, 2, 8) ? 1 : 0;
-    nTex += GET_REG_FIELD(gx->vcdHi, 2, 10) ? 1 : 0;
-    nTex += GET_REG_FIELD(gx->vcdHi, 2, 12) ? 1 : 0;
-    nTex += GET_REG_FIELD(gx->vcdHi, 2, 14) ? 1 : 0;
+    nCols = 33 - __cntlzw(GET_REG_FIELD(gx->vcdLo, 4, 13));
+    nCols /= 2;
+    nTex = 33 - __cntlzw(GET_REG_FIELD(gx->vcdHi, 16, 0));
+    nTex /= 2;
     reg = (nCols) | (nNrm << 2) | (nTex << 4);
     GX_WRITE_XF_REG(8, reg);
     gx->bpSentNot = 1;
