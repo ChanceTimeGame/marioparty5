@@ -49,7 +49,7 @@ typedef struct M570Player_s {
 extern OMOBJMAN *objman;
 extern s16 WinGrp;
 HU3DPARMANID M570ParManCreate(HuVecF *pos);
-int M570PanGet(HuVecF *pos);
+s16 M570PanGet(HuVecF *pos);
 void M570SePlay(HuVecF *pos, s16 seId);
 
 /* player.c */

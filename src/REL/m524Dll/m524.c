@@ -798,8 +798,7 @@ static void M524PlayerModeGoal(OMOBJ *obj)
             if(obj->work[1] == 0) {
                 CharMotionShiftSet(work->charNo, obj->mtnId[0], 0.0f, 20.0f, HU3D_MOTATTR_LOOP);
                 work->doneF = TRUE;
-                obj->work[1] = 0;
-                obj->work[0] = 0;
+                obj->work[0] = obj->work[1] = 0;
                 work->mode = 6;
             }
             break;

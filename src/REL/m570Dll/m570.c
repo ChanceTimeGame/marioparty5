@@ -646,10 +646,10 @@ HU3DPARMANID M570ParManCreate(HuVecF *pos)
  * fn_1_17DC  asm 1691-1726   34 insns -- stereo pan for a world position:
  * project it through the live camera and map screen x across the pan range.
  */
-int M570PanGet(HuVecF *pos)
+s16 M570PanGet(HuVecF *pos)
 {
     HuVec2f screen;
-    int pan;
+    s16 pan;
     Hu3D3Dto2D(pos, (s16)CameraWork.no, &screen);
     pan = 32+(64.0f*(screen.x/576.0f));
     return pan;
@@ -705,9 +705,9 @@ static void M570ScoreFadeMain(OMOBJ *obj)
  */
 static void M570SprPopMain(OMOBJ *obj)
 {
+    float scale;
     s16 sprId = obj->work[0];
     float t;
-    float scale;
 
     if(obj->work[1] == 0) {
         espDispOn(obj->work[0]);

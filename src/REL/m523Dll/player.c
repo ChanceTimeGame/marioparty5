@@ -2228,9 +2228,9 @@ int fn_1_9218(void)
 /* asm 6237-6323, 83 insns. */
 void fn_1_92F4(M523_PLAYER *player)
 {
-    float radius;
     float angleDeg;
     HuVecF diff;
+    float radius;
     BOOL close;
 
     do {

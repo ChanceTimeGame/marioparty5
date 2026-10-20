@@ -231,8 +231,7 @@ void M570PlayerCreate(void)
         Hu3DModelShadowSet(modelId);
         M570PlayerMotionSet(work, 0);
         for(j=0; j<3; j++) {
-            modelId = Hu3DModelCreateData(SubMdlDataTbl[j]);
-            obj->mdlId[j+1] = modelId;
+            obj->mdlId[j+1] = modelId = Hu3DModelCreateData(SubMdlDataTbl[j]);
             Hu3DModelAttrSet(modelId, HU3D_ATTR_DISPOFF);
         }
     }
@@ -383,7 +382,6 @@ static void M570CrowdMain(OMOBJ *obj)
 {
     M570_CROWD *work = obj->data;
     HU3DMODELID modelId = obj->mdlId[0];
-    float endTime;
 
     switch(work->mode) {
         case 0:
@@ -399,8 +397,7 @@ static void M570CrowdMain(OMOBJ *obj)
             break;
 
         case 2:
-            endTime = Hu3DMotionMaxTimeGet(modelId)-1.0f;
-            if(endTime != Hu3DMotionTimeGet(modelId)) {
+            if(Hu3DMotionTimeGet(modelId) != Hu3DMotionMaxTimeGet(modelId)-1.0f) {
                 break;
             }
             work->reactNum--;

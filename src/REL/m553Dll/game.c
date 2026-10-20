@@ -425,9 +425,9 @@ s16 fn_1_6218(void)
     s16 endF;
     s16 doneF;
     s16 i;
+    HuVecF puffPos;
     int playerNo;
     HuVecF pos;
-    HuVecF puffPos;
 
     result = 0;
     endF = 0;
