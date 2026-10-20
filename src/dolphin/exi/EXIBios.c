@@ -2,6 +2,8 @@
 #include <dolphin/hw_regs.h>
 #include <dolphin/os.h>
 
+#pragma scheduling off
+
 #define MAX_DEV 3
 #define MAX_CHAN 3
 
@@ -23,6 +25,8 @@
 
 static BOOL __EXIProbe(s32 chan);
 
+const char *__EXIVersion = "<< Dolphin SDK - EXI\trelease build: Apr 17 2003 12:33:17 (0x2301) >>";
+
 typedef struct EXIControl {
     EXICallback exiCallback;
     EXICallback tcCallback;
@@ -41,6 +45,10 @@ typedef struct EXIControl {
 } EXIControl;
 
 static EXIControl Ecb[MAX_CHAN];
+static u32 IDSerialPort1;
+
+extern BOOL __OSInIPL;
+void __OSEnableBarnacle(s32 chan, u32 dev);
 
 s32 __EXIProbeStartTime[2] : (OS_BASE_CACHED | 0x30C0);
 
@@ -200,7 +208,7 @@ BOOL EXISync(s32 chan)
             enabled = OSDisableInterrupts();
             if (exi->state & STATE_SELECTED) {
                 CompleteTransfer(chan);
-                if (__OSGetDIConfig() != 0xff || exi->immLen != 4 || (REG(chan, 0) & 0x00000070) != (EXI_FREQ_1M << 4)
+                if (__OSGetDIConfig() != 0xff || (OSGetConsoleType() & 0xf0000000) == 0x20000000 || exi->immLen != 4 || (REG(chan, 0) & 0x00000070) != (EXI_FREQ_1M << 4)
                     || (REG(chan, 4) != EXI_USB_ADAPTER && REG(chan, 4) != EXI_IS_VIEWER && REG(chan, 4) != 0x04220001) || __OSDeviceCode == 0x8200) {
                     rc = TRUE;
                 }
@@ -533,6 +541,11 @@ static void EXTIntrruptHandler(__OSInterrupt interrupt, OSContext *context)
 
 void EXIInit(void)
 {
+    u32 id;
+
+    while ((REG(0, 3) & 1) == 1 || (REG(1, 3) & 1) == 1 || (REG(2, 3) & 1) == 1)
+        ;
+
     __OSMaskInterrupts(OS_INTERRUPTMASK_EXI_0_EXI | OS_INTERRUPTMASK_EXI_0_TC | OS_INTERRUPTMASK_EXI_0_EXT | OS_INTERRUPTMASK_EXI_1_EXI
         | OS_INTERRUPTMASK_EXI_1_TC | OS_INTERRUPTMASK_EXI_1_EXT | OS_INTERRUPTMASK_EXI_2_EXI | OS_INTERRUPTMASK_EXI_2_TC);
 
@@ -551,12 +564,22 @@ void EXIInit(void)
     __OSSetInterruptHandler(__OS_INTERRUPT_EXI_2_EXI, EXIIntrruptHandler);
     __OSSetInterruptHandler(__OS_INTERRUPT_EXI_2_TC, TCIntrruptHandler);
 
-    if ((OSGetConsoleType() & 0x10000000) != 0) {
+    EXIGetID(0, 2, &IDSerialPort1);
+
+    if (__OSInIPL) {
         __EXIProbeStartTime[0] = __EXIProbeStartTime[1] = 0;
         Ecb[0].idTime = Ecb[1].idTime = 0;
         __EXIProbe(0);
         __EXIProbe(1);
     }
+    else if (EXIGetID(0, 0, &id) && id == 0x07010000) {
+        __OSEnableBarnacle(1, 0);
+    }
+    else if (EXIGetID(1, 0, &id) && id == 0x07010000) {
+        __OSEnableBarnacle(0, 2);
+    }
+
+    OSRegisterVersion(__EXIVersion);
 }
 
 BOOL EXILock(s32 chan, u32 dev, EXICallback unlockedCallback)
@@ -638,6 +661,11 @@ s32 EXIGetID(s32 chan, u32 dev, u32 *id)
     s32 startTime;
     BOOL enabled;
 
+    if (chan == 0 && dev == 2 && IDSerialPort1 != 0) {
+        *id = IDSerialPort1;
+        return 1;
+    }
+
     if (chan < 2 && dev == 0) {
         if (!__EXIProbe(chan)) {
             return 0;
@@ -655,6 +683,8 @@ s32 EXIGetID(s32 chan, u32 dev, u32 *id)
         startTime = __EXIProbeStartTime[chan];
     }
 
+    enabled = OSDisableInterrupts();
+
     err = !EXILock(chan, dev, (chan < 2 && dev == 0) ? UnlockedHandler : NULL);
     if (!err) {
         err = !EXISelect(chan, dev, EXI_FREQ_1M);
@@ -668,6 +698,8 @@ s32 EXIGetID(s32 chan, u32 dev, u32 *id)
         }
         EXIUnlock(chan);
     }
+
+    OSRestoreInterrupts(enabled);
 
     if (chan < 2 && dev == 0) {
         EXIDetach(chan);

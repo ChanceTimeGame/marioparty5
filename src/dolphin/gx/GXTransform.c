@@ -48,18 +48,28 @@ static void WriteProjPS(const register f32 proj[6], register volatile void *dest
     }
 }
 
+static void Copy6Floats(const register f32 src[6], register volatile f32 *dst)
+{
+    register f32 ps_0, ps_1, ps_2;
+
+    asm {
+        psq_l  ps_0,  0(src), 0, 0
+        psq_l  ps_1,  8(src), 0, 0
+        psq_l  ps_2, 16(src), 0, 0
+        psq_st ps_0,  0(dst), 0, 0
+        psq_st ps_1,  8(dst), 0, 0
+        psq_st ps_2, 16(dst), 0, 0
+    }
+}
+
 static void __GXSetProjection(void)
 {
     u32 reg = 0x00061020;
+
     GX_WRITE_U8(0x10);
     GX_WRITE_U32(reg);
-    GX_WRITE_XF_REG_F(32, gx->projMtx[0]);
-    GX_WRITE_XF_REG_F(33, gx->projMtx[1]);
-    GX_WRITE_XF_REG_F(34, gx->projMtx[2]);
-    GX_WRITE_XF_REG_F(35, gx->projMtx[3]);
-    GX_WRITE_XF_REG_F(36, gx->projMtx[4]);
-    GX_WRITE_XF_REG_F(37, gx->projMtx[5]);
-    GX_WRITE_XF_REG_2(38, gx->projType);
+    WriteProjPS(gx->projMtx, &GXWGFifo.f32);
+    GX_WRITE_U32(gx->projType);
 }
 
 void GXSetProjection(f32 mtx[4][4], GXProjectionType type)
@@ -84,20 +94,20 @@ void GXSetProjection(f32 mtx[4][4], GXProjectionType type)
     gx->bpSentNot = 1;
 }
 
-#define qr0 0
+void GXSetProjectionv(const f32 *ptr)
+{
+    gx->projType = ptr[0] == 0.0f ? GX_PERSPECTIVE : GX_ORTHOGRAPHIC;
+    Copy6Floats(&ptr[1], gx->projMtx);
+    __GXSetProjection();
+    gx->bpSentNot = 1;
+}
 
 void GXGetProjectionv(f32 *ptr)
 {
     ASSERTMSGLINE(0x172, ptr, "GXGet*: invalid null pointer");
 
-    ptr[0] = gx->projType;
-
-    ptr[1] = gx->projMtx[0];
-    ptr[2] = gx->projMtx[1];
-    ptr[3] = gx->projMtx[2];
-    ptr[4] = gx->projMtx[3];
-    ptr[5] = gx->projMtx[4];
-    ptr[6] = gx->projMtx[5];
+    ptr[0] = (u32)gx->projType != GX_PERSPECTIVE ? 1.0f : 0.0f;
+    Copy6Floats(gx->projMtx, &ptr[1]);
 }
 
 static void WriteMTXPS4x3(const register f32 mtx[3][4], register volatile f32 *dest)
@@ -110,18 +120,18 @@ static void WriteMTXPS4x3(const register f32 mtx[3][4], register volatile f32 *d
     register f32 a22_a23;
 
     asm {
-        psq_l a00_a01, 0x00(mtx), 0, qr0
-        psq_l a02_a03, 0x08(mtx), 0, qr0
-        psq_l a10_a11, 0x10(mtx), 0, qr0
-        psq_l a12_a13, 0x18(mtx), 0, qr0
-        psq_l a20_a21, 0x20(mtx), 0, qr0
-        psq_l a22_a23, 0x28(mtx), 0, qr0
-        psq_st a00_a01, 0(dest), 0, qr0
-        psq_st a02_a03, 0(dest), 0, qr0
-        psq_st a10_a11, 0(dest), 0, qr0
-        psq_st a12_a13, 0(dest), 0, qr0
-        psq_st a20_a21, 0(dest), 0, qr0
-        psq_st a22_a23, 0(dest), 0, qr0
+        psq_l a00_a01, 0x00(mtx), 0, 0
+        psq_l a02_a03, 0x08(mtx), 0, 0
+        psq_l a10_a11, 0x10(mtx), 0, 0
+        psq_l a12_a13, 0x18(mtx), 0, 0
+        psq_l a20_a21, 0x20(mtx), 0, 0
+        psq_l a22_a23, 0x28(mtx), 0, 0
+        psq_st a00_a01, 0(dest), 0, 0
+        psq_st a02_a03, 0(dest), 0, 0
+        psq_st a10_a11, 0(dest), 0, 0
+        psq_st a12_a13, 0(dest), 0, 0
+        psq_st a20_a21, 0(dest), 0, 0
+        psq_st a22_a23, 0(dest), 0, 0
     }
 }
 
@@ -135,17 +145,17 @@ static void WriteMTXPS3x3from3x4(register f32 mtx[3][4], register volatile f32 *
     register f32 a22_a23;
 
     asm {
-        psq_l  a00_a01, 0x00(mtx), 0, qr0
+        psq_l  a00_a01, 0x00(mtx), 0, 0
         lfs    a02_a03, 0x08(mtx)
-        psq_l  a10_a11, 0x10(mtx), 0, qr0
+        psq_l  a10_a11, 0x10(mtx), 0, 0
         lfs    a12_a13, 0x18(mtx)
-        psq_l  a20_a21, 0x20(mtx), 0, qr0
+        psq_l  a20_a21, 0x20(mtx), 0, 0
         lfs    a22_a23, 0x28(mtx)
-        psq_st a00_a01, 0(dest), 0, qr0
+        psq_st a00_a01, 0(dest), 0, 0
         stfs   a02_a03, 0(dest)
-        psq_st a10_a11, 0(dest), 0, qr0
+        psq_st a10_a11, 0(dest), 0, 0
         stfs   a12_a13, 0(dest)
-        psq_st a20_a21, 0(dest), 0, qr0
+        psq_st a20_a21, 0(dest), 0, 0
         stfs   a22_a23, 0(dest)
     }
 }
@@ -158,19 +168,17 @@ static void WriteMTXPS4x2(const register f32 mtx[2][4], register volatile f32 *d
     register f32 a12_a13;
 
     asm {
-        psq_l a00_a01, 0x00(mtx), 0, qr0
-        psq_l a02_a03, 0x08(mtx), 0, qr0
-        psq_l a10_a11, 0x10(mtx), 0, qr0
-        psq_l a12_a13, 0x18(mtx), 0, qr0
-        psq_st a00_a01, 0(dest), 0, qr0
-        psq_st a02_a03, 0(dest), 0, qr0
-        psq_st a10_a11, 0(dest), 0, qr0
-        psq_st a12_a13, 0(dest), 0, qr0
+        psq_l a00_a01, 0x00(mtx), 0, 0
+        psq_l a02_a03, 0x08(mtx), 0, 0
+        psq_l a10_a11, 0x10(mtx), 0, 0
+        psq_l a12_a13, 0x18(mtx), 0, 0
+        psq_st a00_a01, 0(dest), 0, 0
+        psq_st a02_a03, 0(dest), 0, 0
+        psq_st a10_a11, 0(dest), 0, 0
+        psq_st a12_a13, 0(dest), 0, 0
     }
 }
 
-#pragma peephole off
-#pragma dont_inline on
 void GXLoadPosMtxImm(f32 mtx[3][4], u32 id)
 {
     u32 reg;
@@ -235,9 +243,8 @@ void GXLoadTexMtxImm(f32 mtx[][4], u32 id, GXTexMtxType type)
         WriteMTXPS4x2(mtx, &GXWGFifo.f32);
     }
 }
-#pragma dont_inline reset
 
-void GXSetViewportJitter(f32 left, f32 top, f32 wd, f32 ht, f32 nearz, f32 farz, u32 field)
+void __GXSetViewport(void)
 {
     f32 sx;
     f32 sy;
@@ -249,28 +256,14 @@ void GXSetViewportJitter(f32 left, f32 top, f32 wd, f32 ht, f32 nearz, f32 farz,
     f32 zmax;
     u32 reg;
 
-    CHECK_GXBEGIN(0x387, "GXSetViewport"); // not the correct function name
-
-    if (field == 0) {
-        top -= 0.5f;
-    }
-    sx = wd / 2.0f;
-    sy = -ht / 2.0f;
-    ox = 342.0f + (left + (wd / 2.0f));
-    oy = 342.0f + (top + (ht / 2.0f));
-    zmin = 1.6777215e7f * nearz;
-    zmax = 1.6777215e7f * farz;
+    sx = gx->vpWd / 2.0f;
+    sy = -gx->vpHt / 2.0f;
+    ox = 342.0f + (gx->vpLeft + (gx->vpWd / 2.0f));
+    oy = 342.0f + (gx->vpTop + (gx->vpHt / 2.0f));
+    zmin = gx->vpNearz * gx->zScale;
+    zmax = gx->vpFarz * gx->zScale;
     sz = zmax - zmin;
-    oz = zmax;
-    gx->vpLeft = left;
-    gx->vpTop = top;
-    gx->vpWd = wd;
-    gx->vpHt = ht;
-    gx->vpNearz = nearz;
-    gx->vpFarz = farz;
-    if (gx->fgRange != 0) {
-        __GXSetRange(nearz, gx->fgSideX);
-    }
+    oz = zmax + gx->zOffset;
     reg = 0x5101A;
     GX_WRITE_U8(0x10);
     GX_WRITE_U32(reg);
@@ -280,24 +273,42 @@ void GXSetViewportJitter(f32 left, f32 top, f32 wd, f32 ht, f32 nearz, f32 farz,
     GX_WRITE_XF_REG_F(29, ox);
     GX_WRITE_XF_REG_F(30, oy);
     GX_WRITE_XF_REG_F(31, oz);
+}
+
+void GXSetViewportJitter(f32 left, f32 top, f32 wd, f32 ht, f32 nearz, f32 farz, u32 field)
+{
+    CHECK_GXBEGIN(0x387, "GXSetViewport"); // not the correct function name
+
+    if (field == 0) {
+        top -= 0.5f;
+    }
+    gx->vpLeft = left;
+    gx->vpTop = top;
+    gx->vpWd = wd;
+    gx->vpHt = ht;
+    gx->vpNearz = nearz;
+    gx->vpFarz = farz;
+    __GXSetViewport();
     gx->bpSentNot = 1;
 }
 
 void GXSetViewport(f32 left, f32 top, f32 wd, f32 ht, f32 nearz, f32 farz)
 {
-    GXSetViewportJitter(left, top, wd, ht, nearz, farz, 1U);
+    gx->vpLeft = left;
+    gx->vpTop = top;
+    gx->vpWd = wd;
+    gx->vpHt = ht;
+    gx->vpNearz = nearz;
+    gx->vpFarz = farz;
+    __GXSetViewport();
+    gx->bpSentNot = 1;
 }
 
 void GXGetViewportv(f32 *vp)
 {
     ASSERTMSGLINE(0x3C8, vp, "GXGet*: invalid null pointer");
 
-    vp[0] = gx->vpLeft;
-    vp[1] = gx->vpTop;
-    vp[2] = gx->vpWd;
-    vp[3] = gx->vpHt;
-    vp[4] = gx->vpNearz;
-    vp[5] = gx->vpFarz;
+    Copy6Floats(&gx->vpLeft, vp);
 }
 
 // maybe get it from melee?
@@ -332,24 +343,19 @@ void GXSetScissor(u32 left, u32 top, u32 wd, u32 ht)
 void GXSetScissorBoxOffset(s32 x_off, s32 y_off)
 {
     u32 reg = 0;
-    u32 hx;
-    u32 hy;
 
     CHECK_GXBEGIN(0x45F, "GXSetScissorBoxOffset");
 
     ASSERTMSGLINE(0x462, (u32)(x_off + 342) < 2048, "GXSetScissorBoxOffset: Invalid X offset");
     ASSERTMSGLINE(0x464, (u32)(y_off + 342) < 2048, "GXSetScissorBoxOffset: Invalid Y offset");
 
-    hx = (u32)(x_off + 342) >> 1;
-    hy = (u32)(y_off + 342) >> 1;
 
-    SET_REG_FIELD(0x469, reg, 10, 0, hx);
-    SET_REG_FIELD(0x46A, reg, 10, 10, hy);
+    SET_REG_FIELD(0x469, reg, 10, 0, (u32)(x_off + 342) >> 1);
+    SET_REG_FIELD(0x46A, reg, 10, 10, (u32)(y_off + 342) >> 1);
     SET_REG_FIELD(0x46B, reg, 8, 24, 0x59);
     GX_WRITE_RAS_REG(reg);
     gx->bpSentNot = 0;
 }
-#pragma peephole on
 
 void GXSetClipMode(GXClipMode mode)
 {
