@@ -32,29 +32,48 @@ BOOL __CARDCompareFileName(CARDDir *ent, const char *fileName)
 
 s32 __CARDAccess(CARDControl *card, CARDDir *ent)
 {
+    const DVDDiskID *diskID = card->diskID;
+
     if (ent->gameName[0] == 0xFF) {
         return CARD_RESULT_NOFILE;
     }
 
-    if (card->diskID == &__CARDDiskNone
-        || (memcmp(ent->gameName, card->diskID->gameName, 4) == 0 && memcmp(ent->company, card->diskID->company, 2) == 0)) {
+    if (diskID == &__CARDDiskNone || (memcmp(ent->gameName, diskID->gameName, 4) == 0 && memcmp(ent->company, diskID->company, 2) == 0)) {
         return CARD_RESULT_READY;
     }
 
     return CARD_RESULT_NOPERM;
 }
 
-BOOL __CARDIsPublic(CARDDir *ent)
+s32 __CARDIsWritable(CARDControl *card, CARDDir *ent)
 {
-    if (ent->gameName[0] == 0xFF) {
-        return CARD_RESULT_NOFILE;
-    }
+    const DVDDiskID *diskID = card->diskID;
+    s32 result;
+    u8 perm;
 
-    if ((ent->permission & CARD_ATTR_PUBLIC) != 0) {
+    result = __CARDAccess(card, ent);
+    if (result == CARD_RESULT_NOPERM) {
+        perm = ent->permission & __CARDPermMask;
+
+        if ((perm & 0x20) && (memcmp(ent->gameName, __CARDDiskNone.gameName, 4) == 0 && memcmp(ent->company, __CARDDiskNone.company, 2) == 0)) {
+            return CARD_RESULT_READY;
+        }
+
+        if ((perm & 0x40) && (memcmp(ent->gameName, __CARDDiskNone.gameName, 4) == 0 && memcmp(ent->company, diskID->company, 2) == 0)) {
+            return CARD_RESULT_READY;
+        }
+    }
+    return result;
+}
+
+s32 __CARDIsReadable(CARDControl *card, CARDDir *ent)
+{
+    s32 result = __CARDIsWritable(card, ent);
+
+    if (result == CARD_RESULT_NOPERM && (ent->permission & 0x4)) {
         return CARD_RESULT_READY;
     }
-
-    return CARD_RESULT_NOPERM;
+    return result;
 }
 
 s32 __CARDGetFileNo(CARDControl *card, const char *fileName, s32 *pfileNo)

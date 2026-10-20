@@ -6,10 +6,12 @@
 
 #include <dolphin/CARDPriv.h>
 
+const char *__CARDVersion = "<< Dolphin SDK - CARD\trelease build: Apr 17 2003 12:34:19 (0x2301) >>";
+
 CARDControl __CARDBlock[2];
 DVDDiskID __CARDDiskNone;
 
-static u16 __CARDEncode;
+u16 __CARDEncode;
 
 s32 __CARDReadStatus(s32 chan, u8 *status);
 s32 __CARDClearStatus(s32 chan);
@@ -459,6 +461,8 @@ void CARDInit(void)
         return;
     }
 
+    __CARDEncode = OSGetFontEncode();
+    OSRegisterVersion(__CARDVersion);
     DSPInit();
     OSInitAlarm();
 
