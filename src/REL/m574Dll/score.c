@@ -145,8 +145,7 @@ void fn_1_7468(OMOBJ *obj)
 
     work->unk038 = 0;
     work->unk040 = GWMgRecordGet(9);
-    winId = MgScoreWinCreate(120, 40);
-    work->unk044 = winId;
+    work->unk044 = winId = MgScoreWinCreate(120, 40);
     MgScoreWinPosSet(winId, lbl_1_data_570[0], lbl_1_data_570[1]);
     score = MgScoreCreate(0x960030, -1, 1);
     work->unk048 = score;

@@ -9,7 +9,10 @@
 #include <humath.h>
 #include <math.h>
 
+/* a unit whose retail code calls the audio API unprototyped defines M563_MATH_AUDIO_UNPROTOTYPED */
+#if !defined(__MWERKS__) || !defined(M563_MATH_AUDIO_UNPROTOTYPED)
 #include "game/audio.h"
+#endif
 #include "game/data.h"
 #include "game/frand.h"
 #include "game/hsfex.h"

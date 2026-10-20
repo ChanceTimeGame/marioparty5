@@ -15,6 +15,7 @@
  * inlined into this file's code).
  */
 
+#define M563_MATH_AUDIO_UNPROTOTYPED /* retail calls the audio API unprototyped (mr, not extsh, on HuAudFX* arguments) */
 #include "REL/m563dll/math.c"
 
 #include "game/charman.h"
@@ -1484,9 +1485,9 @@ float fn_1_473C(float value, float range)
 
 float fn_1_4868(float a, float b)
 {
+    float result;
     float absA;
     float absB;
-    float result;
 
     if (a < 0.0f && b < 0.0f) {
         absA = fabs(a);

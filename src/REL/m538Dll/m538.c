@@ -1433,13 +1433,13 @@ static void M538Unk1958(M538_WORK *work)
 {
     M538_PLAYER *player;
     int i;
+    float deg;
     int col;
     int row;
     float nx;
     float nz;
     float ang;
     float a;
-    float deg;
 
     for(i=0; i<4; i++) {
         player = work->player[i];

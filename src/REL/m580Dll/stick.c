@@ -530,6 +530,11 @@ void fn_1_9970(OMOBJ *obj)
 /* 0x744 */ s32 lbl_1_data_744[2] = { 0x86000B, 0x86000C };
 /* 0x74C */ char lbl_1_data_74C[] = "itemhook_L";
 
+static inline s32 M580StickHookData(s32 idx)
+{
+    return lbl_1_data_744[idx];
+}
+
 /* 199 insns. Goalie stick init: hook, effect, collision entry, idle motion. */
 void fn_1_9F44(OMOBJ *obj)
 {
@@ -543,7 +548,7 @@ void fn_1_9F44(OMOBJ *obj)
     obj->work[0] = idx + 4;
     work->unk04C = work->unk000->unk01C;
     work->unk054 = 0;
-    hookMdlId = fn_1_8CA4(lbl_1_data_744[idx]);
+    hookMdlId = fn_1_8CA4(M580StickHookData(idx));
     Hu3DModelHookSet(mdlId, lbl_1_data_74C, hookMdlId);
     eff = &work->unk068;
     eff->unk000 = 1;

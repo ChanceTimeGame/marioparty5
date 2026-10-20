@@ -918,7 +918,8 @@ float fn_1_4150(void)
     float value;
 
     rand = frandmod(201)-100;
-    value = rand/100.0f;
+    value = rand;
+    value = value/100.0f;
     return value;
 }
 

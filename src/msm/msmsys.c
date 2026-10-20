@@ -874,16 +874,14 @@ s32 msmSysInit(MSM_INIT *init, MSM_ARAM *aram)
         return result;
     }
     AIInit(NULL);
-    sndSetHooks(&sndHooks);
     // Written as an if/else into a local rather than `== 2` inline: the
     // original branches here, the branchless form compiles to subfic/cntlzw.
-    // Placement matters too: this is the best of the positions tried (95.89%),
-    // ahead of the sndInit call rather than before msmFioClose.
     if (sys.info->surroundF == 2) {
         surround = TRUE;
     } else {
         surround = FALSE;
     }
+    sndSetHooks(&sndHooks);
     if (sndInit(sys.info->voices, sys.info->music, sys.info->sfx, 1, surround, sys.info->aramSize) != 0) {
         return MSM_ERR_INITFAIL;
     }

@@ -657,7 +657,8 @@ void M506FlowModeEnd(OMOBJ *obj)
                 flow->time += 1;
                 if(flow->time >= 60) {
                     for(i=0; i<M506_PLAYER_MAX; i++) {
-                        GwPlayer[i].mgScore = flow->height[i]*3;
+                        int score = flow->height[i]*3;
+                        GwPlayer[i].mgScore = score;
                     }
                     WipeCreate(WIPE_MODE_OUT, WIPE_TYPE_WHITEFADE, 60);
                     flow->unk30 = 0;
@@ -696,8 +697,8 @@ void M506FlowModeEndSetup(M506_FLOW *flow)
     int best;
     int j;
     int humanBest;
-    M506_CAMSTOP *camStop;
     M506_YCAMERA *camera;
+    M506_CAMSTOP *camStop;
     float posX;
     float posYOfs;
 

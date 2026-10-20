@@ -22,7 +22,11 @@
  * _prolog and _epilog are not reproduced.
  */
 
+/* retail calls the audio API unprototyped here (fn_1_1D44: no extsh on HuAudFXPlayVolPan's
+ * volume and pan): keep game/audio.h out of the CW build. */
+#ifndef __MWERKS__
 #include "game/audio.h"
+#endif
 #include "game/charman.h"
 #include "game/data.h"
 #include "game/flag.h"
@@ -51,6 +55,7 @@
  * its address sits between math.c's bss_650..674 and bss_684. */
 OMOBJMAN *lbl_1_bss_680;
 
+#define M563_MATH_AUDIO_UNPROTOTYPED /* retail calls the audio API unprototyped (mr, not extsh, on HuAudFX* arguments) */
 #include "REL/m563dll/math.c"
 #include "REL/m571dll/host.c"
 
