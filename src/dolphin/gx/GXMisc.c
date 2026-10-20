@@ -1,5 +1,6 @@
 #include <dolphin/PPCArch.h>
 #include <dolphin/gx.h>
+#include <dolphin/hw_regs.h>
 #include <dolphin/os.h>
 #include <stddef.h>
 
@@ -25,6 +26,9 @@ void GXSetMisc(GXMiscToken token, u32 val)
         case GX_MT_DL_SAVE_CONTEXT:
             ASSERTMSGLINE(0xC4, !gx->inDispList, "GXSetMisc: Cannot change DL context setting while making a display list");
             gx->dlSaveContext = (val > 0);
+            break;
+        case GX_MT_ABORT_WAIT_COPYOUT:
+            gx->abtWaitPECopy = (GXBool)(val > 0);
             break;
         case GX_MT_NULL:
             break;
@@ -69,12 +73,50 @@ static inline void __GXAbortWait(u32 clocks)
     } while (time1 - time0 <= (clocks / 4));
 }
 
-void __GXAbortWaitPECopyDone(void)
+static inline u32 __GXReadMEMCounterHL(u32 addrH, u32 addrL)
 {
-    __piReg[6] = 1;
-    __GXAbortWait(0xC8U);
-    __piReg[6] = 0;
-    __GXAbortWait(0x14U);
+    u32 ctrH0;
+    u32 ctrH1;
+    u32 ctrL;
+
+    ctrH0 = GX_GET_MEM_REG(addrH);
+    do {
+        ctrH1 = ctrH0;
+        ctrH0 = GX_GET_MEM_REG(addrH);
+        ctrL = GX_GET_MEM_REG(addrL);
+    } while (ctrH0 != ctrH1);
+
+    return (ctrH0 << 16) | ctrL;
+}
+
+static inline void __GXAbortWaitPECopyDone(void)
+{
+    u32 peCnt0;
+    u32 peCnt1;
+
+    peCnt0 = __GXReadMEMCounterHL(0x27, 0x28);
+    do {
+        peCnt1 = peCnt0;
+        __GXAbortWait(32);
+        peCnt0 = __GXReadMEMCounterHL(0x27, 0x28);
+    } while (peCnt0 != peCnt1);
+}
+
+void __GXAbort(void)
+{
+    if (gx->abtWaitPECopy && GXGetGPFifo()) {
+        __GXAbortWaitPECopyDone();
+    }
+
+    __PIRegs[6] = 1;
+    __GXAbortWait(200);
+    __PIRegs[6] = 0;
+    __GXAbortWait(20);
+}
+
+void GXAbortFrame(void)
+{
+    __GXAbort();
     __GXCleanGPFifo();
 }
 

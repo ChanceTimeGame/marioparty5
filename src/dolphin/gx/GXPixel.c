@@ -22,65 +22,84 @@ void GXSetFog(GXFogType type, f32 startz, f32 endz, f32 nearz, f32 farz, GXColor
     u32 b_s;
     u32 a_hex;
     u32 c_hex;
+    u32 fsel;
+    u32 proj;
 
     CHECK_GXBEGIN(0x8A, "GXSetFog");
+
+    fogclr = 0;
+    fog0 = 0;
+    fog1 = 0;
+    fog2 = 0;
+    fog3 = 0;
 
     ASSERTMSGLINE(0x8C, farz >= 0.0f, "GXSetFog: The farz should be positive value");
     ASSERTMSGLINE(0x8D, farz >= nearz, "GXSetFog: The farz should be larger than nearz");
 
-    if (farz == nearz || endz == startz) {
-        A = 0.0f;
-        B = 0.5f;
-        C = 0.0f;
+    fsel = type & 7;
+    proj = (type >> 3) & 1;
+
+    if (proj) {
+        if (farz == nearz || endz == startz) {
+            a = 0.0f;
+            c = 0.0f;
+        }
+        else {
+            A = 1.0f / (endz - startz);
+            a = A * (farz - nearz);
+            c = A * (startz - nearz);
+        }
     }
     else {
-        A = (farz * nearz) / ((farz - nearz) * (endz - startz));
-        B = farz / (farz - nearz);
-        C = startz / (endz - startz);
+        if (farz == nearz || endz == startz) {
+            A = 0.0f;
+            B = 0.5f;
+            C = 0.0f;
+        }
+        else {
+            A = (farz * nearz) / ((farz - nearz) * (endz - startz));
+            B = farz / (farz - nearz);
+            C = startz / (endz - startz);
+        }
+
+        B_mant = B;
+        B_expn = 0;
+        while (B_mant > 1.0) {
+            B_mant *= 0.5f;
+            B_expn++;
+        }
+        while (B_mant > 0.0f && B_mant < 0.5) {
+            B_mant *= 2.0f;
+            B_expn--;
+        }
+
+        a = A / (f32)(1 << (B_expn + 1));
+        b_m = 8.388638e6f * B_mant;
+        b_s = B_expn + 1;
+        c = C;
+
+        SET_REG_FIELD(0x94, fog1, 24, 0, b_m);
+        SET_REG_FIELD(0x95, fog1, 8, 24, 0xEF);
+
+        SET_REG_FIELD(0x98, fog2, 5, 0, b_s);
+        SET_REG_FIELD(0x99, fog2, 8, 24, 0xF0);
     }
-
-    B_mant = B;
-    B_expn = 0;
-    while (B_mant > 1.0) {
-        B_mant *= 0.5f;
-        B_expn++;
-    }
-    while (B_mant > 0.0f && B_mant < 0.5) {
-        B_mant *= 2.0f;
-        B_expn--;
-    }
-
-    a = A / (f32)(1 << (B_expn + 1));
-    b_m = 8.388638e6f * B_mant;
-    b_s = B_expn + 1;
-    c = C;
-
-    fog1 = 0;
-    SET_REG_FIELD(0x94, fog1, 24, 0, b_m);
-    SET_REG_FIELD(0x95, fog1, 8, 24, 0xEF);
-
-    fog2 = 0;
-    SET_REG_FIELD(0x98, fog2, 5, 0, b_s);
-    SET_REG_FIELD(0x99, fog2, 8, 24, 0xF0);
 
     a_hex = *(u32 *)&a;
     c_hex = *(u32 *)&c;
 
-    fog0 = 0;
     SET_REG_FIELD(0xA0, fog0, 11, 0, (a_hex >> 12) & 0x7FF);
     SET_REG_FIELD(0xA1, fog0, 8, 11, (a_hex >> 23) & 0xFF);
     SET_REG_FIELD(0xA2, fog0, 1, 19, (a_hex >> 31));
     SET_REG_FIELD(0xA3, fog0, 8, 24, 0xEE);
 
-    fog3 = 0;
     SET_REG_FIELD(0xA6, fog3, 11, 0, (c_hex >> 12) & 0x7FF);
     SET_REG_FIELD(0xA7, fog3, 8, 11, (c_hex >> 23) & 0xFF);
     SET_REG_FIELD(0xA8, fog3, 1, 19, (c_hex >> 31));
-    SET_REG_FIELD(0xA9, fog3, 1, 20, 0);
-    SET_REG_FIELD(0xAA, fog3, 3, 21, type);
+    SET_REG_FIELD(0xA9, fog3, 1, 20, proj);
+    SET_REG_FIELD(0xAA, fog3, 3, 21, fsel);
     SET_REG_FIELD(0xAB, fog3, 8, 24, 0xF1);
 
-    fogclr = 0;
     SET_REG_FIELD(0xAE, fogclr, 8, 0, color.b);
     SET_REG_FIELD(0xAF, fogclr, 8, 8, color.g);
     SET_REG_FIELD(0xB0, fogclr, 8, 16, color.r);

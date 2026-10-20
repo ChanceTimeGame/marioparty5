@@ -188,10 +188,10 @@ void GXInitTexObj(GXTexObj *obj, void *image_ptr, u16 width, u16 height, GXTexFm
         t->flags |= 1;
 
         if (format == 8 || format == 9 || format == 10) {
-            SOME_SET_REG_MACRO(t->mode0, 0xa0);
+            SET_REG_FIELD(0, t->mode0, 3, 5, 5);
         }
         else {
-            SOME_SET_REG_MACRO(t->mode0, 0xc0);
+            SET_REG_FIELD(0, t->mode0, 3, 5, 6);
         }
 
         if (width > height) {
@@ -204,7 +204,7 @@ void GXInitTexObj(GXTexObj *obj, void *image_ptr, u16 width, u16 height, GXTexFm
         SET_REG_FIELD(0x278, t->mode1, 8, 8, lmax);
     }
     else {
-        SOME_SET_REG_MACRO(t->mode0, 0x80);
+        SET_REG_FIELD(0, t->mode0, 3, 5, 4);
     }
     t->fmt = format;
     SET_REG_FIELD(0x286, t->image0, 10, 0, width - 1);
@@ -631,6 +631,7 @@ u32 GXGetTexObjTlut(const GXTexObj *tex_obj)
 void GXLoadTexObjPreLoaded(GXTexObj *obj, GXTexRegion *region, GXTexMapID id)
 {
     __GXTlutRegionInt *tlr;
+    u32 m0, m1, img0, img1, img2, img3;
     __GXTexObjInt *t = (__GXTexObjInt *)obj;
     __GXTexRegionInt *r = (__GXTexRegionInt *)region;
 
@@ -1212,6 +1213,32 @@ void __GXGetSUTexSize(GXTexCoordID coord, u16 *width, u16 *height)
 void __GXSetTmemConfig(u32 config)
 {
     switch (config) {
+        case 2:
+            GX_WRITE_RAS_REG(0x8c0d8000);
+            GX_WRITE_RAS_REG(0x900dc000);
+
+            GX_WRITE_RAS_REG(0x8d0d8800);
+            GX_WRITE_RAS_REG(0x910dc800);
+
+            GX_WRITE_RAS_REG(0x8e0d9000);
+            GX_WRITE_RAS_REG(0x920dd000);
+
+            GX_WRITE_RAS_REG(0x8f0d9800);
+            GX_WRITE_RAS_REG(0x930dd800);
+
+            GX_WRITE_RAS_REG(0xac0da000);
+            GX_WRITE_RAS_REG(0xb00dc400);
+
+            GX_WRITE_RAS_REG(0xad0da800);
+            GX_WRITE_RAS_REG(0xb10dcc00);
+
+            GX_WRITE_RAS_REG(0xae0db000);
+            GX_WRITE_RAS_REG(0xb20dd400);
+
+            GX_WRITE_RAS_REG(0xaf0db800);
+            GX_WRITE_RAS_REG(0xb30ddc00);
+
+            break;
         case 1:
             GX_WRITE_RAS_REG(0x8c0d8000);
             GX_WRITE_RAS_REG(0x900dc000);

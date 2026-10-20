@@ -6,22 +6,24 @@
 
 void __GXSetDirtyState(void)
 {
-    if (gx->dirtyState & 1) {
+    u32 dState = gx->dirtyState;
+
+    if (dState & 1) {
         __GXSetSUTexRegs();
     }
-    if (gx->dirtyState & 2) {
+    if (dState & 2) {
         __GXUpdateBPMask();
     }
-    if (gx->dirtyState & 4) {
+    if (dState & 4) {
         __GXSetGenMode();
     }
-    if (gx->dirtyState & 8) {
+    if (dState & 8) {
         __GXSetVCD();
     }
-    if (gx->dirtyState & 0x10) {
+    if (dState & 0x10) {
         __GXSetVAT();
     }
-    if (gx->dirtyState & 0x18) {
+    if (dState & 0x18) {
         __GXCalculateVLim();
     }
     gx->dirtyState = 0;

@@ -291,41 +291,13 @@ void GXSetTevIndRepeat(GXTevStageID tev_stage)
     GXSetTevIndirect(tev_stage, GX_INDTEXSTAGE0, GX_ITF_8, GX_ITB_NONE, GX_ITM_OFF, GX_ITW_0, GX_ITW_0, 1U, 0, 0);
 }
 
-void __GXUpdateBPMask(void)
+void __GXUpdateBPMask(void) { }
+
+void __GXSetIndirectMask(u32 mask)
 {
-    u32 nIndStages;
-    u32 i;
-    u32 tmap;
-    u32 new_imask;
-    u32 nStages;
-    u32 new_dmask;
-
-    new_imask = 0;
-    new_dmask = 0;
-    nIndStages = GET_REG_FIELD(gx->genMode, 3, 16);
-    for (i = 0; i < nIndStages; i++) {
-        switch (i) {
-            case 0:
-                tmap = GET_REG_FIELD(gx->iref, 3, 0);
-                break;
-            case 1:
-                tmap = GET_REG_FIELD(gx->iref, 3, 6);
-                break;
-            case 2:
-                tmap = GET_REG_FIELD(gx->iref, 3, 12);
-                break;
-            case 3:
-                tmap = GET_REG_FIELD(gx->iref, 3, 18);
-                break;
-        }
-        new_imask |= 1 << tmap;
-    }
-
-    if ((u8)gx->bpMask != new_imask) {
-        SET_REG_FIELD(0x26E, gx->bpMask, 8, 0, new_imask);
-        GX_WRITE_SOME_REG5(0x61, gx->bpMask);
-        gx->bpSentNot = 0;
-    }
+    SET_REG_FIELD(0, gx->bpMask, 8, 0, mask);
+    GX_WRITE_RAS_REG(gx->bpMask);
+    gx->bpSentNot = 0;
 }
 
 void __GXFlushTextureState(void)
