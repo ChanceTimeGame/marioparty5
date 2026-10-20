@@ -147,7 +147,7 @@ void __CARDMountCallback(s32 chan, s32 result);
 /* CARDOpen */
 BOOL __CARDCompareFileName(CARDDir *ent, const char *fileName);
 s32 __CARDAccess(CARDControl *card, CARDDir *ent);
-BOOL __CARDIsPublic(CARDDir *ent);
+s32 __CARDIsWritable(CARDControl *card, CARDDir *ent);
 s32 __CARDIsReadable(CARDControl *card, CARDDir *ent);
 s32 __CARDGetFileNo(CARDControl *card, const char *fileName, s32 *pfileNo);
 BOOL __CARDIsOpened(CARDControl *card, s32 fileNo);
@@ -171,6 +171,7 @@ s32 __CARDUnlock(s32 chan, u8 flashID[12]);
 extern CARDControl __CARDBlock[2];
 extern DVDDiskID __CARDDiskNone;
 extern u16 __CARDVendorID;
+extern u8 __CARDPermMask;
 
 #ifdef __cplusplus
 }

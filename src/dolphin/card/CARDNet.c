@@ -6,6 +6,7 @@
 #include <dolphin/CARDPriv.h>
 
 u16 __CARDVendorID = 0xffff;
+u8 __CARDPermMask = 0x1c;
 
 s32 CARDGetSerialNo(s32 chan, u64 *serialNo)
 {
