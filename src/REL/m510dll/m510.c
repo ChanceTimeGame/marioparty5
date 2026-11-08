@@ -41,6 +41,8 @@
 /* 0x58 */ /* float lbl_1_rodata_58 = 360.0f; */
 /* 0x5C */ /* float lbl_1_rodata_5C = 180.0f; */
 
+#include "REL/executor.c"
+
 /* --- .data --- */
 /* 0x0 */ s32 lbl_1_data_0 = 1; /* set by fn_1_260, cleared by fn_1_30C */
 /* 0x4 */ MGSEQ_PARAM lbl_1_data_4 = { 0, 0, fn_1_E8, fn_1_1C0, fn_1_21C, fn_1_2BC, fn_1_30C, fn_1_404, fn_1_494, fn_1_568, fn_1_164 }; /* .data:0x4..0x2C, seqman param */

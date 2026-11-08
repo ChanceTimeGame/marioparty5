@@ -34,6 +34,8 @@
 /* 0x58 */ /* float lbl_1_rodata_58 = 360.0f; */
 /* 0x5C */ /* float lbl_1_rodata_5C = 180.0f; */
 
+#include "REL/executor.c"
+
 /* --- .data --- */
 /* 0x0 */ OMCAMERAVIEW lbl_1_data_0[2] = { /* [0] ObjectSetup, [1] fn_1_3B8 intro move */
     { { 0.0f, 1350.0f, 0.0f }, { 0.0f, 0.0f, 0.0f }, 1180.0f },

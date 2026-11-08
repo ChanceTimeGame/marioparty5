@@ -96,6 +96,8 @@
 #define MB7EV_KOOPAMOT_HOLD 8
 #define MB7EV_KOOPAMOT_MAX 9
 
+#include "REL/executor.c"
+
 typedef struct MB7Ev_Koopa_s {
     int focusF;                         /* 0x00 */
     int focusNextF;                     /* 0x04 */

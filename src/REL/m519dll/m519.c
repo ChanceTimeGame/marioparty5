@@ -22,6 +22,8 @@
 
 #include "math.h"
 
+#include "REL/executor.c"
+
 /* DOL data: retail reads it signed (ObjectSetup mulhw); not in dol.def yet (OUT.txt) */
 extern s32 GlobalCounter;
 

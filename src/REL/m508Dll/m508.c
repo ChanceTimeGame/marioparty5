@@ -116,6 +116,8 @@
 /* 0x754 */ /* s32 lbl_1_rodata_754[6] = { 0x0042000D, 0x00420011, 0x0042000E, 0x0042000F, 0x00420010, 0x00420012 }; */
 /* 0x76C */ /* float lbl_1_rodata_76C = -20.0f; */
 
+#include "REL/executor.c"
+
 /* --- fork B .rodata (named so fndiff compares the referenced bytes) --- */
 /* 0xCC */ static const s32 lbl_1_rodata_CC[3] = { 0x43, 0x44, 0x42 };
 /* 0x150 */ static const s32 lbl_1_rodata_150[3][4] = {

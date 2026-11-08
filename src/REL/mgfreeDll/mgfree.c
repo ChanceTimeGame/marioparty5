@@ -18,6 +18,8 @@
 #include "game/mgdata.h"
 #include "string.h"
 
+#include "REL/executor.c"
+
 /* decide.c lbl_1_data_330: window layout records (0x18) */
 typedef struct MgFreeWinData_s {
     float x;

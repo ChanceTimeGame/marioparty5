@@ -58,6 +58,8 @@
 #define MB4EV_MASU_PUKU MASU_FLAG_BIT(4)
 
 
+#include "REL/executor.c"
+
 typedef struct MB4BubbleEmit_s {
     int wait;
     int num;

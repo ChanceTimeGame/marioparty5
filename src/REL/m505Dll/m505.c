@@ -34,6 +34,8 @@
 #include "game/gamemes.h"
 #include "game/printfunc.h"
 #include "game/wipe.h"
+#include "REL/executor.c"
+
 /* The reference's own declaration returns a value: fn_1_4FB4 0x5AB4 copies
  * the result (`mr r10,r3`) into a dead local. game/hsfex.h is not included on
  * GC so this declaration can differ; nothing else from it is used. */

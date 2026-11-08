@@ -58,6 +58,8 @@
 #define MB1EV_MASU_HHOUSE2 MASU_FLAG_BIT(3)
 #define MB1EV_MASU_HHOUSE3 MASU_FLAG_BIT(1)
 
+#include "REL/executor.c"
+
 typedef struct MB1_TrainPoint_s {
     int idx; //0x00
     int nextIdx; //0x04

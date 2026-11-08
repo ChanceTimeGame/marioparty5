@@ -29,7 +29,7 @@
  *   3  1 host,    prio 104, work 0xB0, main fn_1_85E4   (host.c's, list bss_4CC)
  *   4  2 objects, prio 105, work 0x34, main fn_1_710    (list lbl_1_bss_3A4)
  *
- * _prolog and _epilog are not reproduced.
+ * _prolog and _epilog: REL/executor.c.
  */
 
 #include "game/audio.h"
@@ -56,6 +56,8 @@
 
 #include "math.h"
 #include "humath.h"
+
+#include "REL/executor.c"
 
 /* Object manager; host.c uses it. m571's lbl_1_bss_680 -> ours at 0x6D4. */
 OMOBJMAN *lbl_1_bss_680;

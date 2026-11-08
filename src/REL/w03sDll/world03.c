@@ -46,6 +46,8 @@
 #include "datanum/charmot.h"
 #include "messdir_enum.h"
 
+#include "REL/executor.c"
+
 /* 0x1C8, from the memset in MB3_Create. Offsets named as they are found. */
 typedef struct MB3Work_s {
     s32 objMdlId[2];               /* 0x00 */

@@ -28,6 +28,8 @@
 #endif
 
 
+#include "REL/executor.c"
+
 /* --- .rodata: float/double literals (a used static const folds into the literal pool) --- */
 /* 0x0 pad_03_00000000_rodata: 0x3FE00000 0x00000000 0x40080000 0x00000000 */
 /* 0x10 lbl_1_rodata_10 (0x1): 0x14 -- an aggregate initialiser, write it as a local */

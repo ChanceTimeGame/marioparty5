@@ -29,6 +29,8 @@
 
 /* --- .data --- */
 
+#include "REL/executor.c"
+
 HuVecF lbl_1_data_0 = { 100.0f, 800.0f, -100.0f };   /* light position */
 HuVecF lbl_1_data_C = { 0.3f, -0.8f, 0.3f };         /* light direction */
 HuVecF lbl_1_data_18 = { 40.0f, 45.0f, 1000.0f };    /* light rotation x, y and distance */

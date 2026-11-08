@@ -30,6 +30,8 @@
 /* 0x24 */ /* float lbl_1_rodata_24 = 56.0f; */
 /* 0x28 */ /* float lbl_1_rodata_28[2] = { 24.0f, 0.0f }; */
 
+#include "REL/executor.c"
+
 /* --- .data --- */
 /* 0x0 */ MGSEQ_PARAM lbl_1_data_0 = { 300, 0, fn_1_114, fn_1_1EC, fn_1_25C, fn_1_298, fn_1_2F0, fn_1_37C, fn_1_460, fn_1_59C, fn_1_190 };
 /* 0x28 */ s32 lbl_1_data_28[1] = { 0x00000001 };

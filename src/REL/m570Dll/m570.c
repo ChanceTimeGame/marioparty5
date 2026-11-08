@@ -28,6 +28,8 @@
 
 /* --- forward declarations --- */
 
+#include "REL/executor.c"
+
 void ObjectSetup(void);
 static void M570InitHook(s16 mode, s16 frameNo);
 static void M570FadeInHook(s16 mode, s16 frameNo);

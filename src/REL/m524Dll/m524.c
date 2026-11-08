@@ -123,6 +123,8 @@
 #define MGF_DEBUG_READOUT
 #include "REL/mgframe.h"
 
+#include "REL/executor.c"
+
 typedef struct M524Player_s {
     MGF_PLAYER_HEAD;           /* what MgPlayerConfSet fills in */
     float angle;

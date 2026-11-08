@@ -32,6 +32,8 @@
 #define MGF_S_DATA
 #include "REL/mgframe.h"
 
+#include "REL/executor.c"
+
 /* 0x6C: the live camera view (MgCameraViewSet, moved by fn_1_9FC toward bss_44). */
 MGF_CAMERAVIEW lbl_1_data_6C = {
     1, 1, 20.0f, 20.0f, 5000.0f,

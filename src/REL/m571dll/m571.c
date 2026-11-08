@@ -19,7 +19,7 @@
  * order. So math.c and host.c are included up top and still land after
  * fn_1_3944, in the reference order.
  *
- * _prolog and _epilog are not reproduced.
+ * _prolog and _epilog: REL/executor.c.
  */
 
 /* retail calls the audio API unprototyped here (fn_1_1D44: no extsh on HuAudFXPlayVolPan's
@@ -50,6 +50,8 @@
 
 #include "math.h"
 #include "humath.h"
+
+#include "REL/executor.c"
 
 /* Object manager. Declared ahead of the includes because host.c uses it;
  * its address sits between math.c's bss_650..674 and bss_684. */

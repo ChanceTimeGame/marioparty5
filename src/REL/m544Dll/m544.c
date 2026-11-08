@@ -4,7 +4,7 @@
  * helpers. Written from the reference assembly, functions in reference order;
  * line ranges are into build/mp5-asm/m544Dll/asm/REL/m544Dll/m544.s.
  *
- * _prolog and _epilog are not reproduced.
+ * _prolog and _epilog: REL/executor.c.
  */
 
 #include "game/object.h"
@@ -32,6 +32,8 @@
 
 /* A distance that never goes negative the way retail computes it (m545's M545_DIST). */
 #define M544_DIST(a, b) ((((a)-(b)) > 0.0f) ? ((a)-(b)) : ((a)-(-1.0f*(b))))
+
+#include "REL/executor.c"
 
 void ObjectSetup(void);
 void fn_1_37C(s16 mode, s16 frameNo);

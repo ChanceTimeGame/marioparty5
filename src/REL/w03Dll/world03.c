@@ -118,6 +118,8 @@
 
 /* --- work --- */
 
+#include "REL/executor.c"
+
 /* One record per falling rock, twenty of them at work+0x88. MB3_ObjectCreate
  * only writes +0x0E, which made the array look as though it started at 0x96;
  * MB3_MainObjUpdate walks it with an explicit `p = &work->rock[0]` and settles

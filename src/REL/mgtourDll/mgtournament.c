@@ -24,6 +24,8 @@
 #include "game/mgdata.h"
 #include "math.h"
 
+#include "REL/executor.c"
+
 /* score.c lbl_1_data_920: 0x28 records (field names unknown) */
 typedef struct MgTourScoreRec_s {
     s32 num;

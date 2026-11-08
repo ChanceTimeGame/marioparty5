@@ -18,6 +18,8 @@
 
 #include "math.h"
 
+#include "REL/executor.c"
+
 /* --- .rodata (float/double literals: CodeWarrior pools these) --- */
 /* 0x10 */ const u16 lbl_1_rodata_10[4] = { 1, 2, 4, 8 }; /* camera bits */
 /* 0x18 */ /* s16 lbl_1_rodata_18[4] = { 0x0002, 0x000D, 0x0019, 0x0027 }; */

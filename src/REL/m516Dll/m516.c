@@ -33,6 +33,8 @@
 /* 0x50 */ /* float lbl_1_rodata_50 = 360.0f; */
 /* 0x54 */ /* float lbl_1_rodata_54 = 180.0f; */
 
+#include "REL/executor.c"
+
 /* --- .data --- */
 /* 0x0 */ HuVecF lbl_1_data_0 = { 100.0f, 800.0f, -100.0f };     /* global light position */
 /* 0xC */ HuVecF lbl_1_data_C = { 0.3f, -0.8f, 0.3f };           /* global light direction */

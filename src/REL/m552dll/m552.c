@@ -7,7 +7,7 @@
  * The [m5xx ...] tags name a built twin; "=" is instruction-identical
  * (symbol-normalized), "~" is the same function with this overlay's changes.
  *
- * _prolog and _epilog are not reproduced.
+ * _prolog and _epilog: REL/executor.c.
  */
 
 #include "game/object.h"
@@ -28,6 +28,8 @@
 #include "dolphin/mtx.h"
 
 #include "humath.h"
+
+#include "REL/executor.c"
 
 void ObjectSetup(void);
 void fn_1_148(s16 mode, s16 frameNo);

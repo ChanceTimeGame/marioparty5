@@ -25,6 +25,8 @@
 #include "datanum/mgconst.h"
 #include <math.h>
 
+#include "REL/executor.c"
+
 /* The eight character motions at .data:0x8. The m529 data archive has no
  * published file-name table, so retain the original DATANUM values. */
 static const u32 M529PlayerMotionData[8] = {

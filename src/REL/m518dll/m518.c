@@ -162,6 +162,8 @@
 /* 0x1734 */ /* float lbl_1_rodata_1734 = 3.0f; */
 /* 0x1738 */ /* float lbl_1_rodata_1738 = 32.0f; */
 
+#include "REL/executor.c"
+
 const s32 lbl_1_rodata_50[4] = { 1, 0, 3, 2 }; /* opposite direction (fork C) */
 const M518_POS lbl_1_rodata_60[5] = { { -1, 0 }, { 1, 0 }, { 0, -1 }, { 0, 1 }, { 0, 0 } }; /* direction deltas (fork C; D's 7908/9080 read it too) */
 

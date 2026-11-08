@@ -23,6 +23,8 @@
 #define STAFF_NEXTTYPE (-4)
 #define STAFF_TYPE (-5)
 
+#include "REL/executor.c"
+
 /* the roll script per languageNo: message numbers (one window each, up to five) and commands */
 static const s32 staffData[2][1024] = {
     {

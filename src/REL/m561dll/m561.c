@@ -14,7 +14,7 @@
  * CodeWarrior emits this file's own functions first, then those of its
  * #included files in include order, which is the reference order.
  *
- * _prolog and _epilog are not reproduced.
+ * _prolog and _epilog: REL/executor.c.
  */
 
 
@@ -23,6 +23,8 @@
 #include "dolphin/mtx.h"
 #include "humath.h"
 #include "string.h"
+
+#include "REL/executor.c"
 
 /* m560dll's billboard system, renamed (see m560.c for the field notes). */
 typedef struct M561Bill_s M561_BILL;

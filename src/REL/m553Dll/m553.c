@@ -5,7 +5,7 @@
  * in reference order; line ranges are into
  * build/mp5-asm/m553Dll/asm/REL/m553Dll/m553.s.
  *
- * _prolog and _epilog are not reproduced.
+ * _prolog and _epilog: REL/executor.c.
  */
 
 #include "game/object.h"
@@ -36,6 +36,8 @@
 
 /* A distance that never goes negative the way retail computes it (m545's M545_DIST). */
 #define M553_DIST(a, b) ((((a)-(b)) > 0.0f) ? ((a)-(b)) : ((a)-(-1.0f*(b))))
+
+#include "REL/executor.c"
 
 void ObjectSetup(void);
 void fn_1_2F0(s16 mode, s16 frameNo);

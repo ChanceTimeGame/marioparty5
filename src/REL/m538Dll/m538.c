@@ -201,6 +201,8 @@
  * Everything but the two fields ObjectSetup touches is still unknown -- the
  * padding is a placeholder to be replaced as the init functions are read. */
 
+#include "REL/executor.c"
+
 /* The player's current target, at player+0xD0. Its first word is a pointer to
  * something whose x and z are read, so the whole block is addressed through its
  * own base register rather than off the player. */

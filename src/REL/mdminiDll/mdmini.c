@@ -26,6 +26,8 @@
 #include "messnum/mgmode_sys.h"
 #include "messnum/syshelp.h"
 
+#include "REL/executor.c"
+
 extern void MBPartySaveInit(int boardNo); /* mdparty.c:211 precedent */
 #include "game/mgdata.h" /* fn_1_16978 sdHealthLoss/mgMatch*, fn_1_16358 mgDataTbl */
 

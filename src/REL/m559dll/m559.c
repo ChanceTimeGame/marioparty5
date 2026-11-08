@@ -26,7 +26,7 @@
  * statics in this file put them ahead of math.c's; including them from
  * bill.c after math.c gives the reference order. Keep both includes.
  *
- * _prolog and _epilog are not reproduced.
+ * _prolog and _epilog: REL/executor.c.
  */
 
 #include "game/hu3d.h"
@@ -34,6 +34,8 @@
 #include "dolphin/mtx.h"
 #include "humath.h"
 #include "string.h"
+
+#include "REL/executor.c"
 
 /* m560dll's billboard system, renamed (see m560.c for the field notes). */
 typedef struct M559Bill_s M559_BILL;

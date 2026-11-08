@@ -46,6 +46,8 @@
 /* 0xC0 */ /* float lbl_1_rodata_C0 = 360.0f; */
 /* 0xC4 */ /* float lbl_1_rodata_C4 = 180.0f; */
 
+#include "REL/executor.c"
+
 /* --- .data --- */
 /* 0x0 */ float lbl_1_data_0 = 20.0f;
 /* 0x4 */ float lbl_1_data_4 = 25000.0f;

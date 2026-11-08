@@ -49,6 +49,8 @@
 #define M567_SIDE_PLAYER_MAX 3
 #define M567_NODE_MAX 100
 
+#include "REL/executor.c"
+
 struct M567Node_s;
 typedef BOOL (*M567_TASKFUNC)(struct M567Node_s *node);
 

@@ -37,6 +37,8 @@
 #define MGF_S_DATA
 #include "REL/mgframe.h"
 
+#include "REL/executor.c"
+
 /*
  * 0x6C: the camera. fn_1_1DC reads the Hu3D camera back into it (pos/up/target,
  * fov/near/far) and derives angle/dist; it is never moved afterwards.

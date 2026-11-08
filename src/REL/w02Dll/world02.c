@@ -94,6 +94,8 @@
  * MB2_ParticleCreate's mallocs; the unk fields are the ones no written function
  * has touched yet. */
 
+#include "REL/executor.c"
+
 typedef struct MB2ParticleData_s {
     s16 time;                           /* 0x00 */
     s16 unk02;                          /* 0x02 */

@@ -83,6 +83,8 @@
 #include "humath.h"
 #include "string.h"
 
+#include "REL/executor.c"
+
 /*
  * 0x98 bytes, one per player, allocated by ObjectSetup and never memset -- the
  * init function writes every field it uses.

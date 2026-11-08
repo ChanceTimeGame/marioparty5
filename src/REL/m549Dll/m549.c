@@ -4,7 +4,7 @@
  * Written from the reference assembly, functions in reference order; line
  * ranges are into build/mp5-asm/m549Dll/asm/REL/m549Dll/m549.s.
  *
- * _prolog and _epilog are not reproduced.
+ * _prolog and _epilog: REL/executor.c.
  *
  * This unit is adaptation rather than fresh decompilation: every one of its 43
  * functions has an xmatch twin at >=0.80 and 38 at >=0.90, mostly against
@@ -41,6 +41,8 @@
 
 /* A distance that never goes negative the way retail computes it (m545's M545_DIST). */
 #define M549_DIST(a, b) ((((a)-(b)) > 0.0f) ? ((a)-(b)) : ((a)-(-1.0f*(b))))
+
+#include "REL/executor.c"
 
 void ObjectSetup(void);
 void fn_1_320(s16 mode, s16 frameNo);

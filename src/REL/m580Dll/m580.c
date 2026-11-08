@@ -60,6 +60,8 @@
 /* 0x128 */ /* float lbl_1_rodata_128 = 360.0f; */
 /* 0x12C */ /* float lbl_1_rodata_12C = 180.0f; */
 
+#include "REL/executor.c"
+
 /* --- .data --- */
 /* 0x0 */ OMCAMERAVIEW lbl_1_data_0 = { { 0.0f, 1350.0f, 0.0f }, { 0.0f, 0.0f, 0.0f }, 1180.0f }; /* ObjectSetup */
 /* 0x1C */ HuVecF lbl_1_data_1C = { 1e+02f, 8e+02f, -1e+02f }; /* global light position */

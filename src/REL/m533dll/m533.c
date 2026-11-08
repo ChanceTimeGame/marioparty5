@@ -20,7 +20,7 @@
  * (ObjectSetup's int[2] { -1, -1 } at 0x54 and others); write those as
  * locals. The .data strings are literals where they are used.
  *
- * _prolog and _epilog are not reproduced.
+ * _prolog and _epilog: REL/executor.c.
  */
 
 #include "REL/m563dll/math.c"
@@ -39,6 +39,8 @@
 #include "game/wipe.h"
 
 /* --- .data --- */
+
+#include "REL/executor.c"
 
 HuVecF lbl_1_data_0 = { 13000.0f, 10000.0f, 0.0f };   /* light position */
 HuVecF lbl_1_data_C = { 0.0f, 0.0f, 0.0f };           /* light target */

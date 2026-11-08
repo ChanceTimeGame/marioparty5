@@ -19,6 +19,8 @@
 
 #include "math.h"
 
+#include "REL/executor.c"
+
 const u16 lbl_1_rodata_10[4] = { 1, 2, 4, 8 };
 
 /* --- .rodata (float/double literals: CodeWarrior pools these) --- */

@@ -33,6 +33,8 @@
 #define MATH_LINKAGE
 #include "REL/m526Dll/math.c"
 
+#include "REL/executor.c"
+
 /* --- prototypes (reference order) --- */
 void ObjectSetup(void);
 static void fn_1_15C(void);

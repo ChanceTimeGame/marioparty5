@@ -56,6 +56,8 @@
  * the `& 0x7F` shows up as `clrlwi r0,r3,25`. */
 #define MB2_RandF() (0.007874016f*(frand() & 0x7F))
 
+#include "REL/executor.c"
+
 typedef struct MB2Zen2Data_s {
     float len;                          /* 0x00 */
     float startLen;                     /* 0x04 */

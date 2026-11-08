@@ -143,6 +143,8 @@
 #include "math.h"
 #include "humath.h"
 
+#include "REL/executor.c"
+
 /*
  * The player object's work, 0x90 bytes, allocated per player in ObjectSetup
  * and hung off OMOBJ.data. Named as fields are pinned down; the padding is

@@ -88,6 +88,8 @@
 /* 0x14C */ /* float lbl_1_rodata_14C = 450.0f; */
 /* 0x150 */ /* float lbl_1_rodata_150[2] = { 1400.0f, 0.0f }; */
 
+#include "REL/executor.c"
+
 /* --- .data --- */
 /* 0x0 */ MGSEQ_PARAM lbl_1_data_0 = { 45, 0, fn_1_48A0, fn_1_4920, fn_1_5288, fn_1_55C8, fn_1_5C04, fn_1_5EAC, fn_1_6730, fn_1_6734, fn_1_6764 };
 /* 0x28 */ HuVecF lbl_1_data_28[4] = { { -300.0f, 1400.0f, 400.0f }, { 300.0f, 1400.0f, 400.0f }, { -300.0f, 1400.0f, 600.0f }, { 300.0f, 1400.0f, 600.0f } }; /* player start pos (fn_1_32CC) */

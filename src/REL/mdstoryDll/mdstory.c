@@ -21,6 +21,8 @@
 #include "math.h"
 #include "messnum/syshelp.h" /* includes messdir_enum.h: MESS_STORYMODE_SYS has no messnum header yet */
 
+#include "REL/executor.c"
+
 /* mdparty.c MDPARTY_LERP_DATA (lbl_1_data_544) */
 typedef struct MdStoryLerpData_s {
     HuVecF hvrA;

@@ -34,6 +34,8 @@
 #include "math.h"
 #include "humath.h"
 
+#include "REL/executor.c"
+
 /* game.c, through the three sub-state tables below */
 void M550FadeIn0(void);
 void M550FadeIn1(void);

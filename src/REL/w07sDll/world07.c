@@ -59,6 +59,8 @@
 #define MB7EV_KOOPAMOT_HOLD 8
 #define MB7EV_KOOPAMOT_MAX 9
 
+#include "REL/executor.c"
+
 typedef struct MB7Ev_Koopa_s {
     u8 unk00[0x1C-0x00];                /* 0x00 */
     float maxTime;                      /* 0x1C */

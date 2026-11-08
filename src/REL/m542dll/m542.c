@@ -31,6 +31,8 @@
 #include "humath.h"
 #include "string.h"
 
+#include "REL/executor.c"
+
 void ObjectSetup(void);
 void fn_1_248(s16 mode, s16 frameNo);
 void fn_1_7A0(s16 mode, s16 frameNo);

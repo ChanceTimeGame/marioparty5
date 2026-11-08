@@ -50,6 +50,8 @@
 #define MB4EV_MASU_KAISOO MASU_FLAG_BIT(8)
 #define MB4EV_MASU_PUKU MASU_FLAG_BIT(9)
 
+#include "REL/executor.c"
+
 static OMOBJ *mb4_MainObj;
 static OMOBJ *mb4_BubbleEffObj;
 static OMOBJ *mb4_CoinObj;

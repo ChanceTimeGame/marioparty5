@@ -6,7 +6,7 @@
  * from m551.c, which carries the same functions plus a particle and paper
  * system this overlay does not have.
  *
- * _prolog and _epilog are not reproduced.
+ * _prolog and _epilog: REL/executor.c.
  */
 
 #include "game/object.h"
@@ -36,6 +36,8 @@
 /* A distance that never goes negative the way retail computes it (m545's M545_DIST). */
 #define M541_DIST(a, b) ((((a)-(b)) > 0.0f) ? ((a)-(b)) : ((a)-(-1.0f*(b))))
 #define M541_IDIST(a, b) ((((a)-(b)) > 0) ? ((a)-(b)) : ((a)-(-1*(b))))
+
+#include "REL/executor.c"
 
 void ObjectSetup(void);
 void fn_1_2C0(s16 mode, s16 frameNo);

@@ -43,6 +43,8 @@
 #define MESS_EXTRA_GAME MESSNUM(MESS_EXTRA, 3) /* + selMode: the game's description */
 #define MESS_EXTRA_GAME_START MESSNUM(MESS_EXTRA, 6) /* + selMode: the start confirmation */
 
+#include "REL/executor.c"
+
 /* mdparty/mdmini LERP_DATA (fn_1_2A78 / lbl_1_data_31C) */
 typedef struct MdOmakeLerpData_s {
     HuVecF hvrA;

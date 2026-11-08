@@ -23,6 +23,8 @@
 #include "messdir_enum.h"
 #include "game/frand.h"
 
+#include "REL/executor.c"
+
 /* --- .rodata: float/double literals (a used static const folds into the literal pool) --- */
 /* 0x0 pad_03_00000000_rodata: 0x3FE00000 0x00000000 0x40080000 0x00000000 */
 static const float lbl_1_rodata_10 = 80.0f; /* 0x10 */

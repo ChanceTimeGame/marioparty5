@@ -4,7 +4,7 @@
  * assembly, functions in reference order; line ranges are into
  * build/mp5-asm/m548dll/asm/REL/m548dll/m548.s.
  *
- * _prolog and _epilog are not reproduced.
+ * _prolog and _epilog: REL/executor.c.
  */
 
 #include "game/object.h"
@@ -33,6 +33,8 @@
 #include "math.h"
 #include "humath.h"
 #include "string.h"
+
+#include "REL/executor.c"
 
 void ObjectSetup(void);
 void fn_1_15C(s16 mode, s16 frameNo);

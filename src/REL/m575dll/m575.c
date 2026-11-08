@@ -51,6 +51,8 @@
 /* 0xB8 */ /* double lbl_1_rodata_B8 = 360; */
 /* 0xC0 */ /* double lbl_1_rodata_C0 = 4503601774854144; */
 
+#include "REL/executor.c"
+
 /* --- .data --- */
 /* 0x0 */ s32 lbl_1_data_0 = 1; /* set by fn_1_280, cleared by fn_1_334 */
 /* 0x4 */ MGSEQ_PARAM lbl_1_data_4 = { 30, 0, fn_1_E8, fn_1_1C0, fn_1_21C, fn_1_2DC, fn_1_334, fn_1_444, fn_1_4A0, fn_1_4EC, fn_1_164 };

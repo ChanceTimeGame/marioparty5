@@ -6,7 +6,7 @@
  * reference order; line ranges are into
  * build/mp5-asm/m551Dll/asm/REL/m551Dll/m551.s.
  *
- * _prolog and _epilog are not reproduced.
+ * _prolog and _epilog: REL/executor.c.
  *
  * Two constants a reader will not expect: the four paper models are named
  * "m546-kami01".."m546-kami04" -- m546's object names, not m551's -- and
@@ -41,6 +41,8 @@
 /* A distance that never goes negative the way retail computes it (m545's M545_DIST). */
 #define M551_DIST(a, b) ((((a)-(b)) > 0.0f) ? ((a)-(b)) : ((a)-(-1.0f*(b))))
 #define M551_IDIST(a, b) ((((a)-(b)) > 0) ? ((a)-(b)) : ((a)-(-1*(b))))
+
+#include "REL/executor.c"
 
 void ObjectSetup(void);
 void fn_1_2C0(s16 mode, s16 frameNo);

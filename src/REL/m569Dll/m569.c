@@ -30,6 +30,8 @@
 #define MGF_S_DATA
 #include "REL/mgframe.h"
 
+#include "REL/executor.c"
+
 /* 0x6C: the camera; fn_1_110 derives lbl_1_bss_34 from it, fn_1_820 moves it there. */
 MGF_CAMERAVIEW lbl_1_data_6C = {
     1, 1, 0.0f, 0.0f, 0.0f,

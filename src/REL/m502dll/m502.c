@@ -28,6 +28,8 @@
 /* 0x1C */ /* float lbl_1_rodata_1C = 4.0f; */
 /* 0x20 */ /* float lbl_1_rodata_20[2] = { 8.0f, 0.0f }; */
 
+#include "REL/executor.c"
+
 extern M502_WORK lbl_1_bss_0; /* the work block (.bss below); lbl_1_data_0 points at it */
 
 int rand8(void);

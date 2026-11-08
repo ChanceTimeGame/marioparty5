@@ -20,7 +20,7 @@
  * No omMakeGroupEx call: the group numbers are handed to omAddObjEx and the
  * object pointers are kept in .bss by hand.
  *
- * _prolog and _epilog are not reproduced.
+ * _prolog and _epilog: REL/executor.c.
  */
 
 #include "game/audio.h"
@@ -54,6 +54,8 @@
 #include "humath.h"
 
 #include "REL/m535Dll/m535.h"
+
+#include "REL/executor.c"
 
 /* esprite.c keeps ESPRITE/ESPANIM file-local, so the overlay redeclares them. */
 typedef struct esprite_s {

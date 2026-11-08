@@ -45,6 +45,8 @@
 /* 0x70 */ /* float lbl_1_rodata_70 = 96.0f; */
 /* 0x74 */ /* float lbl_1_rodata_74 = 31.0f; */
 
+#include "REL/executor.c"
+
 /* --- .data --- */
 /* 0x0 */ s32 lbl_1_data_0 = 1;
 /* 0x4 */ MGSEQ_PARAM lbl_1_data_4 = { 60, 0, fn_1_3C8, fn_1_498, fn_1_4EC, fn_1_59C, fn_1_5EC, fn_1_820, fn_1_864, fn_1_8B8, fn_1_43C };

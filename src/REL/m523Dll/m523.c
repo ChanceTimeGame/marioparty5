@@ -65,6 +65,8 @@
 #define MGF_S_DATA
 #include "REL/mgframe.h"
 
+#include "REL/executor.c"
+
 MGF_CAMERAVIEW lbl_1_data_6C = {
     1, 1, 20.0f, 20.0f, 8000.0f,
     { 0.0f, 0.0f, 0.0f }, { 0.0f, 1.0f, 0.0f },
