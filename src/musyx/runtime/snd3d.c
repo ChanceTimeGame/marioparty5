@@ -834,10 +834,6 @@ bool sndRemoveListener(SND_LISTENER* li) {
 
     hwDisableIrq();
 
-    if (li->room != NULL) {
-      RemoveListenerFromRoom(li->room);
-    }
-
     if (li->next != NULL) {
       li->next->prev = li->prev;
     }

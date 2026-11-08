@@ -422,13 +422,12 @@ void fn_1_4700(M523_PLAYER *player)
     HU3DMODELID modelId;
     s16 freeList[3];
     s16 freeCount;
-    s16 i;
     s16 slot;
 
     freeCount = 0;
-    for (i = 0; i < 3; i++) {
-        if (lbl_1_bss_130[i] == 0) {
-            freeList[freeCount++] = i;
+    for (slot = 0; slot < 3; slot++) {
+        if (lbl_1_bss_130[slot] == 0) {
+            freeList[freeCount++] = slot;
         }
     }
 

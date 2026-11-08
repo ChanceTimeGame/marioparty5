@@ -4263,7 +4263,6 @@ static int MB4_SakanaCreate(int type)
     MBEFFECT *effP;
     MBEFFECTDATA *data;
     int i;
-    int animBank;
 
     if(mb4_Work.sakanaEffMdlId == -1) {
         return -1;
@@ -4284,7 +4283,7 @@ static int MB4_SakanaCreate(int type)
     data->rot.x = data->rot.y = data->rot.z = 0;
     data->scale = 100;
     /* The original stores an uninitialised scratch register here. */
-    data->animBank = animBank;
+    data->animBank = type;
     data->color.r = data->color.g = data->color.b = data->color.a = 255;
     return i;
 }

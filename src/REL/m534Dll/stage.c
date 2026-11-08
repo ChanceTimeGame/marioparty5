@@ -290,8 +290,8 @@ void fn_1_3F04(OMOBJ *obj)
 void fn_1_3FA0(OMOBJ *obj)
 {
     M534_STAGE *work = obj->data;
-    HU3DMODELID mdlId;
     s32 i;
+    HU3DMODELID mdlId;
 
     for (i = 0; i < 16; i++) {
         mdlId = Hu3DModelCreateData(0x5C000A);

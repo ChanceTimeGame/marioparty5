@@ -119,8 +119,8 @@ void fn_1_79C8(int side, int idx, int usedF)
 
 void fn_1_79E8(void)
 {
-    int i;
     int j;
+    int i;
 
     for (i = 0; i < M563_SIDE_MAX; i++) {
         for (j = 0; j < M563_COINPOS_MAX; j++) {
