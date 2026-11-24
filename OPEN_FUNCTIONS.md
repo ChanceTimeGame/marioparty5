@@ -7,7 +7,7 @@ by hand.
 *bytes*: size of the original function. Functions at 0% either have no C yet or have C whose
 shape differs from the original (functions merged or split, wrong inlining).
 
-**Summary:** 3,231 functions short of 100%: 401 at 95% or better, 332 at 80-95%, 240 below 80%, 2,258 at 0%; in 329 units.
+**Summary:** 1,552 functions short of 100%: 401 at 95% or better, 332 at 80-95%, 240 below 80%, 579 at 0%; in 329 units.
 
 ## Started, not matching yet
 
@@ -1063,7 +1063,6 @@ Every unit with a function short of 100%, largest remaining code first.
 | `m530Dll/REL/m530Dll/m530` | `src/REL/m530Dll/m530.c` | 12 | 64 | 6,820 |
 | `m564Dll/REL/m564Dll/m564` | `src/REL/m564Dll/m564.c` | 12 | 61 | 6,820 |
 | `m569Dll/REL/m569Dll/m569` | `src/REL/m569Dll/m569.c` | 12 | 54 | 6,820 |
-| `main/auto_03_801A811C_text` | (no source yet) | 1680 | 1680 | 6,720 |
 | `main/musyx/runtime/synthmacros` | `src/musyx/runtime/synthmacros.c` | 6 | 52 | 6,496 |
 | `mdstoryDll/REL/mdstoryDll/mdstory` | `src/REL/mdstoryDll/mdstory.c` | 3 | 43 | 6,492 |
 | `main/dolphin/vi/vi` | `src/dolphin/vi/vi.c` | 13 | 23 | 6,416 |
@@ -1325,3 +1324,4 @@ Every unit with a function short of 100%, largest remaining code first.
 | `main/dolphin/os/__ppc_eabi_init` | `src/dolphin/os/__ppc_eabi_init.c` | 1 | 5 | 36 |
 | `main/dolphin/os/OSTime` | `src/dolphin/os/OSTime.c` | 1 | 5 | 24 |
 | `m511Dll/REL/m511Dll/boat` | `src/REL/m511Dll/boat.cpp` | 1 | 19 | 4 |
+| `main/game/code_801A811C` | `src/game/code_801A811C.c` | 1 | 1680 | 4 |

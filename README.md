@@ -3,7 +3,7 @@
 A matching decompilation of Mario Party 5 (GameCube, US, `GP5E01_00`). Built with the original
 compilers, it produces a `main.dol` and RELs byte-identical to the retail game.
 
-**Progress:** 18,000 of 21,231 functions match (84.8%), 82.3% of code bytes. Everything else is either
+**Progress:** 19,679 of 21,231 functions match (92.7%), 82.3% of code bytes. Everything else is either
 decompiled C that does not yet compile to identical code, or code with no C yet.
 [OPEN_FUNCTIONS.md](OPEN_FUNCTIONS.md) lists every one of them.
 

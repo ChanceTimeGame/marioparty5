@@ -1551,3 +1551,6 @@ game/code_801A7E90.c:
 	.text       start:0x801A7E90 end:0x801A811C
 	.data       start:0x801D7FF0 end:0x801D8090
 	.bss        start:0x80287F20 end:0x80288000
+
+game/code_801A811C.c:
+	.text       start:0x801A811C end:0x801A9B5C
