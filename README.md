@@ -1,100 +1,64 @@
-Mario Party 5  
-[![Build Status]][actions] [![Progress]][progress site] [![DOL Progress]][progress site] [![RELs Progress]][progress site] [![Discord Badge]][discord]
-=============
+# Mario Party 5 (US) decompilation
 
-[Build Status]: https://github.com/mariopartyrd/marioparty5/actions/workflows/build.yml/badge.svg
-[actions]: https://github.com/mariopartyrd/marioparty5/actions/workflows/build.yml
-[Progress]: https://decomp.dev/mariopartyrd/marioparty5.svg?mode=shield&measure=code&label=Code&category=all
-[DOL Progress]: https://decomp.dev/mariopartyrd/marioparty5.svg?mode=shield&measure=code&label=DOL&category=dol
-[RELs Progress]: https://decomp.dev/mariopartyrd/marioparty5.svg?mode=shield&measure=code&label=RELs&category=modules
-[progress site]: https://decomp.dev/mariopartyrd/marioparty5
-[Discord Badge]: https://img.shields.io/discord/994839212618690590?color=%237289DA&logo=discord&logoColor=%23FFFFFF
-[discord]: https://discord.gg/T4faGveujK
+A matching decompilation of Mario Party 5 (GameCube, US, `GP5E01_00`). Built with the original
+compilers, it produces a `main.dol` and RELs byte-identical to the retail game.
 
-A work-in-progress decompilation of Mario Party 5.
+**Progress:** 18,000 of 21,231 functions match (84.8%), 82.3% of code bytes. Everything else is either
+decompiled C that does not yet compile to identical code, or code with no C yet.
+[OPEN_FUNCTIONS.md](OPEN_FUNCTIONS.md) lists every one of them.
 
-This repository does **not** contain any game assets or assembly whatsoever. An existing copy of the game is required.
+This repository is a fork of [mariopartyrd/marioparty5](https://github.com/mariopartyrd/marioparty5).
+Thanks to everyone who worked on it.
 
-Supported versions:
+## Why this fork exists: Chance Time
 
-- `GP5E01_00`: Rev 0 (USA)
+This fork is the decompilation behind Mario Party 5 in **Chance Time**, a native PC port of the
+N64 and GameCube Mario Party games. Chance Time ships no game data: players supply their own ROM
+or disc.
 
-Dependencies
-============
+How the two fit together:
 
-Windows
---------
+- **This repository is a pure matching decompilation.** It holds decompiled game code only, with
+  no PC-port code, no `#ifdef` for a PC build and no host types. Every commit passes the
+  `build.sha1` check against the retail disc.
+- **Chance Time compiles this code for the PC.** While Mario Party 5 is short of 100%, matching
+  work is done alongside the port and published here with every port change removed. Once it
+  reaches 100%, Chance Time takes this repository as a submodule and keeps its own changes as a
+  patch series on top, as it already does for
+  [Mario Party 4](https://github.com/ChanceTimeGame/marioparty4).
+- **Non-matching C must still be correct.** The PC port compiles every unit's C, including units
+  still marked `NonMatching`, so a function is only left short of 100% once its remaining
+  difference is register allocation, instruction order or a symbol name: same calls, same
+  constants, same stores.
+- **The Mario Party games share an engine.** Mario Party 4 is fully matched
+  ([ChanceTimeGame/marioparty4](https://github.com/ChanceTimeGame/marioparty4)) and Mario Party 6
+  is under way ([ChanceTimeGame/marioparty6](https://github.com/ChanceTimeGame/marioparty6)). A
+  matched function in one game is often the starting point for its twin in another, and Mario
+  Party 4's Dolphin SDK and runtime sources are the base for this game's later revision.
 
-On Windows, it's **highly recommended** to use native tooling. WSL or msys2 are **not** required.  
-When running under WSL, [objdiff](#diffing) is unable to get filesystem notifications for automatic rebuilds.
+Once Mario Party 5 reaches 100% this repository is finished: it takes genuine decompilation fixes
+only.
 
-- Install [Python](https://www.python.org/downloads/) and add it to `%PATH%`.
-  - Also available from the [Windows Store](https://apps.microsoft.com/store/detail/python-311/9NRWMJP3717K).
-- Download [ninja](https://github.com/ninja-build/ninja/releases) and add it to `%PATH%`.
-  - Quick install via pip: `pip install ninja`
+## Contributing
 
-macOS
-------
+See [CONTRIBUTING.md](CONTRIBUTING.md) for the workflow, the checks a change must pass and the
+compiler details that matter, and [OPEN_FUNCTIONS.md](OPEN_FUNCTIONS.md) for where to start. Pull
+requests are welcome.
 
-- Install [ninja](https://github.com/ninja-build/ninja/wiki/Pre-built-Ninja-packages):
+## Building
 
-  ```sh
-  brew install ninja
-  ```
+This repository contains no game assets or assembly. You need your own copy of the game.
 
-- Install [wine-crossover](https://github.com/Gcenx/homebrew-wine):
+1. Install [Python 3](https://www.python.org/downloads/) and
+   [ninja](https://github.com/ninja-build/ninja/releases) (`pip install ninja` works). On Linux
+   x86-64, [wibo](https://github.com/decompals/wibo) is downloaded for the Windows compilers; on
+   other Linux platforms and on macOS, install Wine. On Windows, use native tools: WSL is not
+   needed.
+2. `git clone https://github.com/ChanceTimeGame/marioparty5`.
+3. Put your disc image (ISO, RVZ, WIA, WBFS, CISO, NFS, GCZ or TGC) in `orig/GP5E01_00/`. After the
+   first build it can be deleted.
+4. `python configure.py`, then `ninja`. The build checks every output against
+   `config/GP5E01_00/build.sha1`; `ninja progress` prints the totals.
 
-  ```sh
-  brew install --cask --no-quarantine gcenx/wine/wine-crossover
-  ```
-
-After OS upgrades, if macOS complains about `Wine Crossover.app` being unverified, you can unquarantine it using:
-
-```sh
-sudo xattr -rd com.apple.quarantine '/Applications/Wine Crossover.app'
-```
-
-Linux
-------
-
-- Install [ninja](https://github.com/ninja-build/ninja/wiki/Pre-built-Ninja-packages).
-- For non-x86(_64) platforms: Install wine from your package manager.
-  - For x86(_64), [wibo](https://github.com/decompals/wibo), a minimal 32-bit Windows binary wrapper, will be automatically downloaded and used.
-
-Building
-========
-
-- Clone the repository:
-
-  ```sh
-  git clone https://github.com/mariopartyrd/marioparty5.git
-  ```
-
-- Copy your game's disc image to `orig/GP5E01_00`.
-  - Supported formats: ISO (GCM), RVZ, WIA, WBFS, CISO, NFS, GCZ, TGC
-  - After the initial build, the disc image can be deleted to save space.
-
-- Configure:
-
-  ```sh
-  python configure.py
-  ```
-
-  To use a version other than `GP5E01_00` (USA), specify it with `--version`.
-
-- Build:
-
-  ```sh
-  ninja
-  ```
-
-Diffing
-=======
-
-Once the initial build succeeds, an `objdiff.json` should exist in the project root.
-
-Download the latest release from [encounter/objdiff](https://github.com/encounter/objdiff). Under project settings, set `Project directory`. The configuration should be loaded automatically.
-
-Select an object from the left sidebar to begin diffing. Changes to the project will rebuild automatically: changes to source files, headers, `configure.py`, `splits.txt` or `symbols.txt`.
-
-![](assets/objdiff.png)
+To compare functions, open the repository in [objdiff](https://github.com/encounter/objdiff): it
+reads `objdiff.json`, written by the first build, and rebuilds on every change.
