@@ -1,12 +1,7 @@
 #include "msm/msmmus.h"
 #include "msm/msmmem.h"
 
-#include <stdint.h>
 
-#ifdef BYTESWAPPING
-#include "port/audiocheck.h"
-#include "port/byteswap.h"
-#endif
 
 typedef struct MusPlayer_s {
     /* 0x00 */ s16 musId;
@@ -40,13 +35,6 @@ static struct {
     /* 0x00C */ MSM_MUS *musData;
     /* 0x010 */ s32 dummyMusOfs;
     /* 0x014 */ void* musBuf;
-#ifdef BYTESWAPPING
-    // One bit per song: set once its arrangement has been converted to host
-    // order. A song whose bit is clear must not reach the sequencer -- the
-    // conversion stops at the first thing it cannot account for, so what it
-    // leaves behind is part converted and would be walked as pointers.
-    u8 *songSwapped;
-#endif
     /* 0x018 */ MUS_PLAYER player[4];
 } mus;
 
@@ -291,91 +279,6 @@ s32 msmMusStop(int musNo, s32 speed) {
     return 0;
 }
 
-#ifdef BYTESWAPPING
-static void msmMusMarkSwapped(s32 musId, BOOL swapped) {
-    u8 bit = (u8) (1 << (musId & 7));
-
-    if (mus.songSwapped == NULL) {
-        return;
-    }
-    if (swapped) {
-        mus.songSwapped[musId >> 3] |= bit;
-    } else {
-        mus.songSwapped[musId >> 3] &= (u8) ~bit;
-    }
-}
-
-static BOOL msmMusIsSwapped(s32 musId) {
-    if (mus.songSwapped == NULL) {
-        return FALSE;
-    }
-    return (mus.songSwapped[musId >> 3] & (1 << (musId & 7))) != 0;
-}
-
-// A group's song arrangements live inside the group's own data block, so they
-// arrive big-endian along with the project, pool and sample directory. musyx
-// converts those from sndPushGroup(), but an arrangement only reaches it as a
-// pointer passed to sndSeqPlay(), so the conversion has to be driven from here.
-//
-// Doing it once per group load is what makes it exactly-once: replaying a song
-// reuses the same buffer, and converting an arrangement twice would put it back
-// into big-endian order.
-void msmMusSwapGroupSongs(s32 grpId, s32 grpDataSize, MSM_GRP_HEAD *grpData) {
-    s32 i;
-    s32 j;
-    s32 converted;
-    s32 failed;
-
-    if (mus.musData == NULL || grpData == NULL) {
-        return;
-    }
-    // No standalone check on sngOfs: a group with no songs stores it equal to
-    // dataSize, an empty block at the end of the buffer. What has to hold is
-    // checked per song below, where there is a real arrangement to bound.
-    converted = failed = 0;
-    for (i = 0; i < mus.musMax; i++) {
-        MSM_MUS *entry = &mus.musData[i];
-
-        if (entry->songGrp != grpId || entry->sgid == 0xFFFF || entry->songSize <= 0) {
-            continue;
-        }
-        // Two songs can name the same arrangement; convert it only once.
-        for (j = 0; j < i; j++) {
-            if (mus.musData[j].songGrp == grpId && mus.musData[j].songOfs == entry->songOfs) {
-                break;
-            }
-        }
-        if (j < i) {
-            continue;
-        }
-        // The arrangement is reached by adding two offsets out of the file to a
-        // buffer whose size the file also states. Check the result lands inside
-        // the buffer before handing musyx a pointer to convert in place.
-        if (!PB_AUDIO_CHECK(PB_AUDIO_IN_BOUNDS((s64) grpData->sngOfs + entry->songOfs,
-                                               entry->songSize, grpDataSize),
-                            "group %d song %d: arrangement [0x%X +0x%X) is outside the %d byte "
-                            "group buffer",
-                            grpId, i, grpData->sngOfs + entry->songOfs, entry->songSize,
-                            grpDataSize)) {
-            msmMusMarkSwapped(i, FALSE);
-            failed++;
-            continue;
-        }
-        if (sndSwapSongData((void*) ((uintptr_t) grpData + grpData->sngOfs + entry->songOfs),
-                            entry->songSize)) {
-            msmMusMarkSwapped(i, TRUE);
-            converted++;
-        } else {
-            msmMusMarkSwapped(i, FALSE);
-            failed++;
-            OSReport("msm: song %d of group %d did not convert; it will not play.\n", i, grpId);
-        }
-    }
-    if (converted != 0 || failed != 0) {
-        OSReport("msm: group %d: %d song(s) converted, %d failed.\n", grpId, converted, failed);
-    }
-}
-#endif
 
 int msmMusPlay(int musId, MSM_MUSPARAM* musParam) {
     s32 var_r30;
@@ -415,15 +318,6 @@ int msmMusPlay(int musId, MSM_MUSPARAM* musParam) {
                 return MSM_ERR_READFAIL;
             }
             msmFioClose(&sp10);
-#ifdef BYTESWAPPING
-            // Read fresh from the file, and only when the song actually
-            // changes -- so this converts each buffer exactly once.
-            if (!sndSwapSongData(temp_r27->songBuf, temp_r28->songSize)) {
-                msmMusMarkSwapped(musId, FALSE);
-                return MSM_ERR_INVALIDFILE;
-            }
-            msmMusMarkSwapped(musId, TRUE);
-#endif
             temp_r27->arrfile = temp_r27->songBuf;
         }
     } else {
@@ -431,12 +325,7 @@ int msmMusPlay(int musId, MSM_MUSPARAM* musParam) {
         if (temp_r3_2 == NULL) {
             return MSM_ERR_MUSGRP_NOTLOADED;
         }
-        temp_r27->arrfile = (void*) ((uintptr_t) temp_r3_2 + temp_r3_2->sngOfs + temp_r28->songOfs);
-#ifdef BYTESWAPPING
-        if (!msmMusIsSwapped(musId)) {
-            return MSM_ERR_INVALIDFILE;
-        }
-#endif
+        temp_r27->arrfile = (void*) ((u32) temp_r3_2 + temp_r3_2->sngOfs + temp_r28->songOfs);
     }
     temp_r27->busyF = 1;
     temp_r27->vol = temp_r28->vol;
@@ -497,13 +386,6 @@ s32 msmMusInit(MSM_SYS* arg0, DVDFileInfo* arg1) {
     if (msmFioRead(arg1, mus.musData, arg0->header->musSize, arg0->header->musOfs) < 0) {
         return MSM_ERR_READFAIL;
     }
-#ifdef BYTESWAPPING
-    byteswap_msmmus(mus.musData, arg0->header->musSize / (s32)sizeof(MSM_MUS));
-    if ((mus.songSwapped = msmMemAlloc((arg0->info->musMax + 7) / 8)) == NULL) {
-        return MSM_ERR_OUTOFMEM;
-    }
-    memset(mus.songSwapped, 0, (arg0->info->musMax + 7) / 8);
-#endif
     temp_r4 = arg0->info->dummyMusSize;
     if (temp_r4 != 0) {
         if ((mus.musBuf = msmMemAlloc(temp_r4 * arg0->info->musChanMax)) == NULL) {
@@ -517,7 +399,7 @@ s32 msmMusInit(MSM_SYS* arg0, DVDFileInfo* arg1) {
     mus.dummyMusOfs = arg0->header->dummyMusOfs;
     mus.msmEntryNum = arg0->msmEntryNum;
     for (var_r8 = 0; var_r8 < mus.musChanMax; var_r8++) {
-        mus.player[var_r8].songBuf = (void*) ((uintptr_t) mus.musBuf + arg0->info->dummyMusSize * var_r8);
+        mus.player[var_r8].songBuf = (void*) ((u32) mus.musBuf + arg0->info->dummyMusSize * var_r8);
         mus.player[var_r8].musId = -1;
         mus.player[var_r8].busyF = 0;
     }

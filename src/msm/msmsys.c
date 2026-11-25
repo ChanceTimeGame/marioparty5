@@ -5,12 +5,7 @@
 #include "msm/msmse.h"
 #include "msm/msmstream.h"
 
-#include <stdint.h>
 
-#ifdef BYTESWAPPING
-#include "port/audiocheck.h"
-#include "port/byteswap.h"
-#endif
 
 static MSM_SYS sys;
 
@@ -107,23 +102,6 @@ static s32 msmSysSetAuxParam(s32 auxA, s32 auxB)
     return FALSE;
 }
 
-#ifdef BYTESWAPPING
-// projOfs/sdirOfs/poolOfs come out of the file and are handed to musyx as
-// pointers, which then walks them. A bad one is not survivable, so it is worth
-// stating here that they have to land inside the buffer that was read.
-static BOOL msmSysCheckGrpHead(s32 grpId, s32 dataSize, MSM_GRP_HEAD *head)
-{
-    return PB_AUDIO_CHECK(PB_AUDIO_IN_BOUNDS(head->projOfs, 0, dataSize),
-                          "group %d: projOfs 0x%X outside %d byte buffer", grpId, head->projOfs,
-                          dataSize) &&
-           PB_AUDIO_CHECK(PB_AUDIO_IN_BOUNDS(head->sdirOfs, 0, dataSize),
-                          "group %d: sdirOfs 0x%X outside %d byte buffer", grpId, head->sdirOfs,
-                          dataSize) &&
-           PB_AUDIO_CHECK(PB_AUDIO_IN_BOUNDS(head->poolOfs, 0, dataSize),
-                          "group %d: poolOfs 0x%X outside %d byte buffer", grpId, head->poolOfs,
-                          dataSize);
-}
-#endif
 
 static s32 msmSysLoadBaseGroup(void *buf)
 {
@@ -146,16 +124,8 @@ static s32 msmSysLoadBaseGroup(void *buf)
             msmFioClose(&file);
             return MSM_ERR_READFAIL;
         }
-#ifdef BYTESWAPPING
-        byteswap_msmgrphead(grpData);
-        if (!msmSysCheckGrpHead(sys.info->baseGrp[i], grpInfo->dataSize, grpData)) {
-            msmFioClose(&file);
-            return MSM_ERR_GRP_FAILPUSH;
-        }
-        msmMusSwapGroupSongs(sys.info->baseGrp[i], grpInfo->dataSize, grpData);
-#endif
-        if (!sndPushGroup((void*) (grpData->projOfs + (uintptr_t) grpData), grpInfo->gid, buf,
-            (void*) (grpData->sdirOfs + (uintptr_t) grpData), (void*) (grpData->poolOfs + (uintptr_t) grpData)))
+        if (!sndPushGroup((void*) (grpData->projOfs + (u32) grpData), grpInfo->gid, buf,
+            (void*) (grpData->sdirOfs + (u32) grpData), (void*) (grpData->poolOfs + (u32) grpData)))
         {
             msmFioClose(&file);
             return MSM_ERR_GRP_FAILPUSH;
@@ -224,9 +194,6 @@ s32 msmSysGroupInit(DVDFileInfo *file)
     if (msmFioRead(file, sys.grpInfo, sys.header->grpInfoSize, sys.header->grpInfoOfs) < 0) {
         return MSM_ERR_READFAIL;
     }
-#ifdef BYTESWAPPING
-    byteswap_msmgrpinfo(sys.grpInfo, sys.header->grpInfoSize / (s32)sizeof(MSM_GRP_INFO));
-#endif
     if ((sys.grpBufA = msmMemAlloc(sys.info->grpBufSizeA * sys.grpStackAMax)) == NULL) {
         return MSM_ERR_OUTOFMEM;
     }
@@ -247,13 +214,13 @@ s32 msmSysGroupInit(DVDFileInfo *file)
         stack = &sys.grpStackA[i];
         stack->grpId = stack->baseGrpF = 0;
         stack->num = 0;
-        stack->buf = (void*) ((uintptr_t) sys.grpBufA + sys.info->grpBufSizeA * i);
+        stack->buf = (void*) ((u32) sys.grpBufA + sys.info->grpBufSizeA * i);
     }
     for (i = 0; i < sys.grpStackBMax; i++) {
         stack = &sys.grpStackB[i];
         stack->grpId = stack->baseGrpF = 0;
         stack->num = 0;
-        stack->buf = (void*) ((uintptr_t) sys.grpBufB + sys.info->grpBufSizeB * i);
+        stack->buf = (void*) ((u32) sys.grpBufB + sys.info->grpBufSizeB * i);
     }
     sys.sampSize = 0;
     for (i = 0; i < sys.baseGrpNum; i++) {
@@ -563,15 +530,8 @@ static s32 msmSysPushGroup(DVDFileInfo *file, void *buf, MSM_GRP_STACK *grp, s32
         return MSM_ERR_READFAIL;
     }
     grpBuf = grp->buf;
-#ifdef BYTESWAPPING
-    byteswap_msmgrphead(grpBuf);
-    if (!msmSysCheckGrpHead(grpId, grpInfo->dataSize, grpBuf)) {
-        return MSM_ERR_GRP_FAILPUSH;
-    }
-    msmMusSwapGroupSongs(grpId, grpInfo->dataSize, grpBuf);
-#endif
-    if (!sndPushGroup((void*) (grpBuf->projOfs + (uintptr_t) grpBuf), grpInfo->gid, buf,
-        (void*) (grpBuf->sdirOfs + (uintptr_t) grpBuf), (void*) (grpBuf->poolOfs + (uintptr_t) grpBuf)))
+    if (!sndPushGroup((void*) (grpBuf->projOfs + (u32) grpBuf), grpInfo->gid, buf,
+        (void*) (grpBuf->sdirOfs + (u32) grpBuf), (void*) (grpBuf->poolOfs + (u32) grpBuf)))
     {
         return MSM_ERR_GRP_FAILPUSH;
     }
@@ -788,9 +748,6 @@ s32 msmSysInit(MSM_INIT *init, MSM_ARAM *aram)
         msmFioClose(&sp10);
         return MSM_ERR_READFAIL;
     }
-#ifdef BYTESWAPPING
-    byteswap_msmheader(sys.header);
-#endif
     if (sys.header->version != MSM_FILE_VERSION) {
         msmFioClose(&sp10);
         return MSM_ERR_INVALIDFILE;
@@ -803,9 +760,6 @@ s32 msmSysInit(MSM_INIT *init, MSM_ARAM *aram)
         msmFioClose(&sp10);
         return MSM_ERR_READFAIL;
     }
-#ifdef BYTESWAPPING
-    byteswap_msminfo(sys.info);
-#endif
     if (aram != NULL) {
         if (aram->skipARInit == 0) {
             ARInit(aram->stackIndex, aram->aramEnd);
@@ -856,10 +810,6 @@ s32 msmSysInit(MSM_INIT *init, MSM_ARAM *aram)
                 result = MSM_ERR_READFAIL;
             }
             else {
-#ifdef BYTESWAPPING
-                byteswap_msmauxparam(sys.auxParam,
-                    sys.header->auxParamSize / (s32)sizeof(MSM_AUXPARAM));
-#endif
                 result = 0;
             }
         }

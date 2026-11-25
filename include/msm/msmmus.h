@@ -4,11 +4,6 @@
 #include "msm.h"
 #include "msm/msmsys.h"
 
-#ifdef BYTESWAPPING
-// Converts the arrangements of every song stored in the group just loaded into
-// `grpData`; see msmmus.c.
-void msmMusSwapGroupSongs(s32 grpId, s32 grpDataSize, MSM_GRP_HEAD *grpData);
-#endif
 
 void msmMusFdoutEnd(void);
 void msmMusPeriodicProc(void);
